@@ -16,43 +16,42 @@ export function LevelStreakCards({ stats }: LevelStreakCardsProps) {
 
   return (
     <div className="grid grid-cols-2 gap-3">
-      <Card>
+      <Card className="overflow-hidden">
         <CardContent className="p-5">
-          <div className="flex items-center gap-2 mb-2">
-            <div className="w-8 h-8 flex items-center justify-center bg-secondary rounded-lg">
-              <Trophy className="w-4 h-4 text-primary" />
+          <div className="flex items-center gap-2 mb-3">
+            <div className="w-9 h-9 flex items-center justify-center bg-primary/10 rounded-xl">
+              <Trophy className="w-5 h-5 text-primary" />
             </div>
-            <span className="text-xs font-semibold text-primary uppercase tracking-wide">
+            <span className="text-xs font-extrabold text-primary uppercase tracking-widest">
               {t.level}
             </span>
           </div>
-          <div className="text-4xl font-bold text-primary mb-1">
+          <div className="text-5xl font-black text-primary mb-1">
             {getLevelFromXP(stats.totalXP)}
           </div>
-          <div className="text-xs text-muted-foreground mb-2">
+          <div className="text-xs font-bold text-muted-foreground mb-3">
             {getXPForNextLevel(stats.totalXP)}XP {t.nextLevel}
           </div>
-          <Progress value={getLevelProgress(stats.totalXP)} className="h-2" />
+          <Progress value={getLevelProgress(stats.totalXP)} className="h-3" />
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className="overflow-hidden">
         <CardContent className="p-5">
-          <div className="flex items-center gap-2 mb-2">
-            <div className="w-8 h-8 flex items-center justify-center bg-orange-100 dark:bg-orange-950 rounded-lg">
-              <Flame className="w-4 h-4 text-orange-600 dark:text-orange-400" />
+          <div className="flex items-center gap-2 mb-3">
+            <div className="w-9 h-9 flex items-center justify-center bg-streak/10 rounded-xl">
+              <Flame className="w-5 h-5 text-streak" />
             </div>
-            <span className="text-xs font-semibold text-orange-600 dark:text-orange-400 uppercase tracking-wide">
+            <span className="text-xs font-extrabold text-streak uppercase tracking-widest">
               {t.dailyStreak}
             </span>
           </div>
           <div className="flex items-baseline gap-1 mb-1">
-            <div className="text-4xl font-bold text-orange-600 dark:text-orange-400">
+            <div className="text-5xl font-black text-streak">
               {stats.currentStreak}
             </div>
-            <div className="text-xl">🔥</div>
           </div>
-          <div className="text-xs text-muted-foreground">
+          <div className="text-xs font-bold text-muted-foreground">
             {t.bestStreak}: {stats.bestStreak}{t.streakDays}
           </div>
         </CardContent>

@@ -1,7 +1,6 @@
 "use client";
 
 import { useLang } from "@/components/common/LangContext";
-import { ProgressBar } from "@/components/common/ProgressBar";
 import { LoginButton } from "@/components/common/LoginButton";
 import { QUESTIONS } from "@/data/questions";
 import { CATEGORIES } from "@/data/categories";
@@ -47,34 +46,36 @@ export function HomeScreen({ progress, stats, user, onStart, onCategoryMode, onW
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="max-w-md mx-auto px-4 py-8 space-y-6">
-        <div className="text-center space-y-2">
-          <h1 className="text-4xl font-bold text-primary">
+      {/* Top Bar */}
+      <header className="sticky top-0 z-10 bg-card border-b-2 border-border">
+        <div className="max-w-lg mx-auto px-4 h-14 flex items-center justify-between">
+          <h1 className="text-2xl font-black text-primary tracking-tight font-sans">
             {t.appName}
           </h1>
-          <p className="text-sm text-muted-foreground">{t.tagline}</p>
+          <div className="flex items-center gap-2">
+            <LoginButton user={user} />
+            <LangToggle lang={lang} setLang={setLang} />
+            <ThemeToggle />
+          </div>
         </div>
+      </header>
 
-        <div className="flex justify-center gap-2">
-          <LoginButton user={user} />
-          <LangToggle lang={lang} setLang={setLang} />
-          <ThemeToggle />
-        </div>
-
+      <main className="max-w-lg mx-auto px-4 py-6 space-y-5">
         <StatsCard dueCount={dueCount} todayCorrect={stats.todayCorrect} todayTotal={stats.todayTotal} />
 
         <LevelStreakCards stats={stats} />
 
+        {/* Main CTA */}
         <div className="space-y-3">
-          <Button onClick={onStart} size="lg" className="w-full h-16 text-lg font-bold">
+          <Button onClick={onStart} size="lg" className="w-full h-16 text-lg">
             {dueCount > 0 ? t.startSession : t.reviewAll}
           </Button>
           <div className="grid grid-cols-2 gap-3">
-            <Button onClick={onCategoryMode} variant="outline" size="lg" className="h-14 font-semibold">
+            <Button onClick={onCategoryMode} variant="outline" size="lg" className="h-14">
               <FolderOpen className="w-5 h-5 mr-2" />
               {t.categoryMode}
             </Button>
-            <Button onClick={onWeakness} variant="outline" size="lg" className="h-14 font-semibold">
+            <Button onClick={onWeakness} variant="outline" size="lg" className="h-14">
               <TrendingDown className="w-5 h-5 mr-2" />
               {lang === "ko" ? "약점 분석" : "Weakness"}
             </Button>
@@ -85,13 +86,13 @@ export function HomeScreen({ progress, stats, user, onStart, onCategoryMode, onW
 
         <TipCard />
 
-        <div className="flex justify-between items-center">
-          <p className="text-xs text-muted-foreground">{t.saved}</p>
+        <div className="flex justify-between items-center pb-4">
+          <p className="text-xs font-semibold text-muted-foreground">{t.saved}</p>
           <Button onClick={onReset} variant="link" className="text-xs h-auto p-0 text-muted-foreground hover:text-destructive">
             {t.resetProgress}
           </Button>
         </div>
-      </div>
+      </main>
     </div>
   );
 }

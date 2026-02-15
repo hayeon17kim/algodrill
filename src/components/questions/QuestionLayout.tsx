@@ -1,5 +1,4 @@
 import { ReactNode } from "react";
-import { Card } from "@/components/ui/card";
 import { useLang } from "@/components/common/LangContext";
 import { L, type Bilingual } from "@/lib/i18n";
 
@@ -18,7 +17,7 @@ interface QuestionLayoutProps {
 
 /**
  * Common layout wrapper for all question types
- * Provides consistent structure: type badge → question card → answer area
+ * Duolingo-style clean layout: type pill, bold question, answer area
  */
 export function QuestionLayout({
   badgeIcon,
@@ -31,18 +30,16 @@ export function QuestionLayout({
 
   return (
     <div className="space-y-6">
-      {/* Type Badge */}
-      <div className={`flex items-center gap-2 text-sm font-semibold ${badgeColorClass} px-3 py-2 rounded-lg w-fit`}>
+      {/* Type Badge — pill style */}
+      <div className={`inline-flex items-center gap-2 text-xs font-extrabold uppercase tracking-widest ${badgeColorClass} px-3 py-1.5 rounded-xl`}>
         {badgeIcon}
         {badgeLabel}
       </div>
 
-      {/* Question Card */}
-      <Card className="p-6">
-        <p className="text-xl font-bold leading-relaxed">
-          {typeof question === 'string' ? question : L(question, lang)}
-        </p>
-      </Card>
+      {/* Question Text — big and bold, no card wrapper */}
+      <h2 className="text-2xl font-black leading-snug text-balance">
+        {typeof question === 'string' ? question : L(question, lang)}
+      </h2>
 
       {/* Answer Area (children) */}
       {children}
