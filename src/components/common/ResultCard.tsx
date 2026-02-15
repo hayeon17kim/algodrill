@@ -1,5 +1,4 @@
 import { ReactNode } from "react";
-import { Card } from "@/components/ui/card";
 import { CheckCircle, AlertCircle, XCircle } from "lucide-react";
 
 interface ResultCardProps {
@@ -11,25 +10,25 @@ interface ResultCardProps {
 }
 
 /**
- * Shared result card component used across question types
- * Shows success/error/info feedback with consistent styling
+ * Duolingo-style result feedback banner
+ * Shows success/error/info feedback with bold colors and rounded design
  */
 export function ResultCard({ variant, icon = "check", title, children, className = "" }: ResultCardProps) {
   const variantStyles = {
     success: {
-      card: "border-green-300 dark:border-green-800 bg-green-50 dark:bg-green-950",
-      iconBg: "bg-green-500",
-      textColor: "text-green-900 dark:text-green-100",
+      bg: "bg-primary/10 border-primary/30",
+      iconBg: "bg-primary",
+      textColor: "text-primary",
     },
     error: {
-      card: "border-amber-300 dark:border-amber-800 bg-amber-50 dark:bg-amber-950",
-      iconBg: "bg-amber-500",
-      textColor: "text-amber-900 dark:text-amber-100",
+      bg: "bg-destructive/10 border-destructive/30",
+      iconBg: "bg-destructive",
+      textColor: "text-destructive",
     },
     info: {
-      card: "border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-950",
-      iconBg: "bg-blue-500",
-      textColor: "text-blue-900 dark:text-blue-100",
+      bg: "bg-info/10 border-info/30",
+      iconBg: "bg-info",
+      textColor: "text-info",
     },
   };
 
@@ -43,16 +42,16 @@ export function ResultCard({ variant, icon = "check", title, children, className
   const styles = variantStyles[variant];
 
   return (
-    <Card className={`p-5 border-2 ${styles.card} ${className}`}>
+    <div className={`p-5 rounded-2xl border-2 ${styles.bg} ${className}`}>
       <div className="flex items-start gap-3">
-        <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${styles.iconBg}`}>
-          <Icon className="w-5 h-5 text-white" />
+        <div className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 ${styles.iconBg}`}>
+          <Icon className="w-5 h-5 text-card" />
         </div>
         <div className="flex-1">
-          <p className={`font-bold text-lg mb-2 ${styles.textColor}`}>{title}</p>
-          <div className="text-sm leading-relaxed">{children}</div>
+          <p className={`font-extrabold text-lg mb-2 ${styles.textColor}`}>{title}</p>
+          <div className="text-sm leading-relaxed font-semibold">{children}</div>
         </div>
       </div>
-    </Card>
+    </div>
   );
 }

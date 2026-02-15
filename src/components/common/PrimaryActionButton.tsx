@@ -23,7 +23,7 @@ export function PrimaryActionButton({
       onClick={onClick}
       size="lg"
       disabled={disabled}
-      className={`w-full h-14 font-bold text-lg ${className}`}
+      className={`w-full h-14 text-base ${className}`}
     >
       {children}
     </Button>

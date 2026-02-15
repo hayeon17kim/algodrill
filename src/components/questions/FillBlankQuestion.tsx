@@ -4,7 +4,6 @@ import { useState } from "react";
 import { useLang } from "@/components/common/LangContext";
 import { L } from "@/lib/i18n";
 import type { FillBlankQuestion as FBQ } from "@/data/questions";
-import { Card } from "@/components/ui/card";
 import { QuestionLayout } from "./QuestionLayout";
 import { PrimaryActionButton } from "@/components/common/PrimaryActionButton";
 import { ResultCard } from "@/components/common/ResultCard";
@@ -31,14 +30,14 @@ export function FillBlankQuestion({ q, onAnswer }: { q: FBQ; onAnswer: (correct:
       badgeColorClass={typeBadgeColors.fillblank}
       question={q.question}
     >
-      <Card className="p-0 overflow-hidden border-2 border-gray-700 dark:border-gray-600">
-        <pre className="bg-gray-900 dark:bg-gray-950 text-green-400 p-5 text-sm overflow-x-auto leading-relaxed font-mono whitespace-pre-wrap">{q.code}</pre>
-      </Card>
+      <div className="rounded-2xl overflow-hidden border-2 border-foreground/20">
+        <pre className="bg-foreground text-primary-foreground p-5 text-sm overflow-x-auto leading-relaxed font-mono whitespace-pre-wrap">{q.code}</pre>
+      </div>
       <div className="space-y-5">
         {q.blanks.map((blank, bi) => (
           <div key={bi} className="space-y-3">
-            <p className="text-sm font-bold flex items-center gap-2">
-              <span className="w-6 h-6 rounded-full bg-secondary text-primary flex items-center justify-center text-xs font-bold">
+            <p className="text-sm font-extrabold flex items-center gap-2">
+              <span className="w-7 h-7 rounded-xl bg-primary text-primary-foreground flex items-center justify-center text-xs font-black">
                 {bi + 1}
               </span>
               {L(blank.placeholder, lang)}
@@ -69,13 +68,13 @@ export function FillBlankQuestion({ q, onAnswer }: { q: FBQ; onAnswer: (correct:
         </PrimaryActionButton>
       )}
       {revealed && (
-        <div className="space-y-4">
+        <div className="space-y-4 animate-slide-up">
           <ResultCard
             variant={allCorrect ? "success" : "error"}
             icon={allCorrect ? "check" : "alert"}
             title={allCorrect ? t.allCorrect : `${results.filter((r) => r).length}/${results.length} ${t.correct}`}
           >
-            <p className="text-gray-700 dark:text-gray-300">{L(q.explanation, lang)}</p>
+            <p className="text-muted-foreground">{L(q.explanation, lang)}</p>
           </ResultCard>
           <PrimaryActionButton onClick={() => onAnswer(allCorrect)}>
             {t.next}

@@ -8,9 +8,7 @@ import {
   getOverallAccuracy,
   type QuestionProgress,
 } from "@/lib/storage";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Lightbulb } from "lucide-react";
 import { OverallAccuracyCard } from "@/components/weakness/OverallAccuracyCard";
 import { WeakPatternsCard } from "@/components/weakness/WeakPatternsCard";
 import { CategoryAccuracyList } from "@/components/weakness/CategoryAccuracyList";
@@ -23,7 +21,7 @@ interface WeaknessDashboardProps {
 }
 
 export function WeaknessDashboard({ progress, onBack, onFocusCategory }: WeaknessDashboardProps) {
-  const { lang, t } = useLang();
+  const { lang } = useLang();
 
   const overallAccuracy = getOverallAccuracy(progress);
   const categoryStats = getCategoryStats(progress);
@@ -32,18 +30,19 @@ export function WeaknessDashboard({ progress, onBack, onFocusCategory }: Weaknes
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="max-w-4xl mx-auto p-4">
-        <div className="flex items-center justify-between mb-6">
-          <Button variant="ghost" onClick={onBack} className="gap-2">
-            <ArrowLeft className="w-4 h-4" />
-            {t.back}
-          </Button>
-          <h1 className="text-2xl font-bold">
+      {/* Header */}
+      <header className="sticky top-0 z-10 bg-card border-b-2 border-border">
+        <div className="max-w-lg mx-auto px-4 h-14 flex items-center gap-3">
+          <button onClick={onBack} className="text-muted-foreground hover:text-foreground transition-colors">
+            <ArrowLeft className="w-6 h-6" strokeWidth={3} />
+          </button>
+          <h1 className="text-lg font-black uppercase tracking-wide">
             {lang === "ko" ? "약점 분석" : "Weakness Analysis"}
           </h1>
-          <div className="w-20" />
         </div>
+      </header>
 
+      <main className="max-w-lg mx-auto px-4 py-6 space-y-5">
         <OverallAccuracyCard
           accuracy={overallAccuracy}
           totalAttempts={categoryStats.reduce((sum, cat) => sum + cat.total, 0)}
@@ -60,15 +59,15 @@ export function WeaknessDashboard({ progress, onBack, onFocusCategory }: Weaknes
 
         <QuestionTypeAccuracyGrid typeStats={typeStats} lang={lang} />
 
-        <Card className="bg-blue-50 dark:bg-blue-950 border-blue-200 dark:border-blue-900">
-          <CardContent className="p-6 text-center text-sm text-blue-800 dark:text-blue-200">
-            💡{" "}
+        <div className="rounded-2xl border-2 border-info/30 bg-info/10 p-5">
+          <div className="flex items-center gap-3 text-sm font-bold text-foreground">
+            <Lightbulb className="w-5 h-5 text-info flex-shrink-0" />
             {lang === "ko"
               ? "약한 카테고리를 클릭하면 집중 연습할 수 있습니다"
               : "Click on weak categories to practice them"}
-          </CardContent>
-        </Card>
-      </div>
+          </div>
+        </div>
+      </main>
     </div>
   );
 }

@@ -16,9 +16,9 @@ export function CategoryAccuracyList({ categoryStats, lang }: CategoryAccuracyLi
   const sortedCategories = [...categoryStats].sort((a, b) => a.accuracy - b.accuracy);
 
   return (
-    <Card className="mb-6">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
+    <Card>
+      <CardHeader className="pb-3">
+        <CardTitle className="flex items-center gap-2 text-base font-extrabold uppercase tracking-wider text-muted-foreground">
           <BarChart3 className="w-5 h-5" />
           {lang === "ko" ? "카테고리별 정답률" : "Accuracy by Category"}
         </CardTitle>
@@ -33,16 +33,16 @@ export function CategoryAccuracyList({ categoryStats, lang }: CategoryAccuracyLi
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
                   <span className="text-lg">{cat.icon}</span>
-                  <span className="font-medium">{L(cat.name, lang)}</span>
-                  <span className="text-xs text-muted-foreground">
+                  <span className="font-bold">{L(cat.name, lang)}</span>
+                  <span className="text-xs font-bold text-muted-foreground">
                     ({stat.correct}/{stat.total})
                   </span>
                 </div>
-                <div className="font-bold">{stat.accuracy}%</div>
+                <div className="font-black">{stat.accuracy}%</div>
               </div>
-              <div className="w-full h-3 bg-secondary rounded-full overflow-hidden">
+              <div className="w-full h-4 bg-secondary rounded-full overflow-hidden">
                 <div
-                  className={`h-full ${getBarColor(stat.accuracy)} transition-all duration-500`}
+                  className={`h-full rounded-full ${getBarColor(stat.accuracy)} transition-all duration-500`}
                   style={{ width: `${stat.accuracy}%` }}
                 />
               </div>
