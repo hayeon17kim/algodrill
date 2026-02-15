@@ -4,7 +4,7 @@ import { useLang } from "@/components/common/LangContext";
 import { L } from "@/lib/i18n";
 import { QUESTIONS } from "@/data/questions";
 import { CATEGORIES } from "@/data/categories";
-import type { QuestionProgress } from "@/lib/storage";
+import { getCategoryProgressStats, type QuestionProgress } from "@/lib/storage";
 
 interface Props {
   progress: Record<string, QuestionProgress>;
@@ -14,15 +14,6 @@ interface Props {
 
 export function CategoryScreen({ progress, onSelectCategory, onBack }: Props) {
   const { lang, t } = useLang();
-  const now = Date.now();
-
-  const getCategoryStats = (catId: string) => {
-    const qs = QUESTIONS.filter((q) => q.categoryId === catId);
-    const total = qs.length;
-    const mastered = qs.filter((q) => (progress[q.id]?.streak || 0) >= 3).length;
-    const due = qs.filter((q) => (progress[q.id]?.nextReview || 0) <= now).length;
-    return { total, mastered, due };
-  };
 
   const activeCats = CATEGORIES.filter((c) => QUESTIONS.some((q) => q.categoryId === c.id));
 
@@ -37,7 +28,7 @@ export function CategoryScreen({ progress, onSelectCategory, onBack }: Props) {
 
         <div className="space-y-3">
           {activeCats.map((cat) => {
-            const s = getCategoryStats(cat.id);
+            const s = getCategoryProgressStats(progress, cat.id);
             const pct = s.total > 0 ? Math.round((s.mastered / s.total) * 100) : 0;
             return (
               <button key={cat.id} onClick={() => onSelectCategory(cat.id)}

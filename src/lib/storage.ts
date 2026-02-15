@@ -1,5 +1,13 @@
 import { supabase, isSupabaseConfigured } from "./supabase";
 import { QUESTIONS, type Question } from "@/data/questions";
+import {
+  MASTERED_STREAK_THRESHOLD,
+  SRS_INTERVALS_HOURS,
+  SUPABASE_BATCH_SIZE,
+  WEAKNESS_ANALYSIS_DAYS,
+  PERFECT_ACCURACY_THRESHOLD,
+  XP_PER_LEVEL,
+} from "./constants";
 
 // ─── Types ──────────────────────────────────────────────────
 export interface QuestionProgress {
@@ -8,9 +16,19 @@ export interface QuestionProgress {
   lastSeen: number;
 }
 
+export interface Stats {
+  todayCorrect: number;
+  todayTotal: number;
+  lastDate: string;
+  totalXP: number;
+  currentStreak: number;
+  bestStreak: number;
+  lastStudyDate: string;
+}
+
 export interface AppState {
   progress: Record<string, QuestionProgress>;
-  stats: { todayCorrect: number; todayTotal: number; lastDate: string };
+  stats: Stats;
   lang: "ko" | "en";
 }
 
@@ -44,11 +62,11 @@ export async function syncToServer(userId: string, progress: Record<string, Ques
     last_seen: p.lastSeen ? new Date(p.lastSeen).toISOString() : null,
   }));
 
-  // Upsert in batches of 50
-  for (let i = 0; i < rows.length; i += 50) {
+  // Upsert in batches
+  for (let i = 0; i < rows.length; i += SUPABASE_BATCH_SIZE) {
     await supabase
       .from("user_progress")
-      .upsert(rows.slice(i, i + 50), { onConflict: "user_id,question_id" });
+      .upsert(rows.slice(i, i + SUPABASE_BATCH_SIZE), { onConflict: "user_id,question_id" });
   }
 }
 
@@ -74,7 +92,6 @@ export async function loadFromServer(userId: string): Promise<Record<string, Que
 }
 
 // ─── Spaced Repetition ──────────────────────────────────────
-const SRS_INTERVALS_HOURS = [1, 3, 8, 24, 72];
 
 export function getInitialProgress(): Record<string, QuestionProgress> {
   const p: Record<string, QuestionProgress> = {};
@@ -153,6 +170,12 @@ export interface WeaknessInsight {
   categoryId: string;
   accuracy: number;
   recentErrors: number; // last 7 days
+}
+
+export interface CategoryProgressStats {
+  total: number;
+  mastered: number;
+  due: number;
 }
 
 /**
@@ -238,10 +261,10 @@ export function getDifficultyStats(progress: Record<string, QuestionProgress>): 
 }
 
 /**
- * Find weak categories from last 7 days
+ * Find weak categories from last N days (configured by WEAKNESS_ANALYSIS_DAYS)
  */
 export function getWeakCategories(progress: Record<string, QuestionProgress>): WeaknessInsight[] {
-  const sevenDaysAgo = Date.now() - 7 * 24 * 3600000;
+  const sevenDaysAgo = Date.now() - WEAKNESS_ANALYSIS_DAYS * 24 * 3600000;
   const categoryMap: Record<string, { total: number; correct: number; recentErrors: number }> = {};
 
   QUESTIONS.forEach((q) => {
@@ -270,7 +293,7 @@ export function getWeakCategories(progress: Record<string, QuestionProgress>): W
       accuracy: stats.total > 0 ? Math.round((stats.correct / stats.total) * 100) : 0,
       recentErrors: stats.recentErrors,
     }))
-    .filter((insight) => insight.accuracy < 100); // Only show categories with room for improvement
+    .filter((insight) => insight.accuracy < PERFECT_ACCURACY_THRESHOLD); // Only show categories with room for improvement
 
   // Sort by: 1) recent errors descending, 2) accuracy ascending
   return insights.sort((a, b) => {
@@ -294,4 +317,123 @@ export function getOverallAccuracy(progress: Record<string, QuestionProgress>): 
   });
 
   return total > 0 ? Math.round((correct / total) * 100) : 0;
+}
+
+/**
+ * Calculate progress stats for a specific category
+ */
+export function getCategoryProgressStats(
+  progress: Record<string, QuestionProgress>,
+  categoryId: string
+): CategoryProgressStats {
+  const now = Date.now();
+  const categoryQuestions = QUESTIONS.filter((q) => q.categoryId === categoryId);
+
+  const total = categoryQuestions.length;
+  const mastered = categoryQuestions.filter(
+    (q) => (progress[q.id]?.streak || 0) >= MASTERED_STREAK_THRESHOLD
+  ).length;
+  const due = categoryQuestions.filter(
+    (q) => (progress[q.id]?.nextReview || 0) <= now
+  ).length;
+
+  return { total, mastered, due };
+}
+
+/**
+ * Get overall progress stats (mastered and due count)
+ */
+export function getOverallProgressStats(
+  progress: Record<string, QuestionProgress>
+): { mastered: number; due: number } {
+  const now = Date.now();
+  const mastered = Object.values(progress).filter(
+    (p) => p.streak >= MASTERED_STREAK_THRESHOLD
+  ).length;
+  const due = QUESTIONS.filter(
+    (q) => (progress[q.id]?.nextReview || 0) <= now
+  ).length;
+
+  return { mastered, due };
+}
+
+// ─── XP & Level System ──────────────────────────────────────
+/**
+ * Calculate XP earned for a question based on difficulty
+ */
+export function getXPForQuestion(difficulty: number, correct: boolean): number {
+  if (!correct) return 0;
+  return difficulty === 1 ? 10 : difficulty === 2 ? 20 : 30;
+}
+
+/**
+ * Calculate level from total XP
+ */
+export function getLevelFromXP(xp: number): number {
+  return Math.floor(xp / XP_PER_LEVEL) + 1;
+}
+
+/**
+ * Calculate XP needed for next level
+ */
+export function getXPForNextLevel(currentXP: number): number {
+  const currentLevel = getLevelFromXP(currentXP);
+  return currentLevel * XP_PER_LEVEL - currentXP;
+}
+
+/**
+ * Get XP progress percentage for current level (0-100)
+ */
+export function getLevelProgress(currentXP: number): number {
+  const xpInCurrentLevel = currentXP % XP_PER_LEVEL;
+  return xpInCurrentLevel;
+}
+
+// ─── Daily Streak System ────────────────────────────────────
+/**
+ * Update streak based on last study date
+ */
+export function updateStreak(stats: Stats): Stats {
+  const today = new Date().toISOString().split("T")[0];
+  const lastStudy = stats.lastStudyDate || "";
+
+  if (lastStudy === today) {
+    // Already studied today, keep streak
+    return stats;
+  }
+
+  const yesterday = new Date(Date.now() - 24 * 3600000).toISOString().split("T")[0];
+
+  if (lastStudy === yesterday) {
+    // Consecutive study day
+    const newStreak = stats.currentStreak + 1;
+    return {
+      ...stats,
+      currentStreak: newStreak,
+      bestStreak: Math.max(stats.bestStreak, newStreak),
+      lastStudyDate: today,
+    };
+  } else {
+    // Streak broken
+    return {
+      ...stats,
+      currentStreak: 1,
+      lastStudyDate: today,
+    };
+  }
+}
+
+/**
+ * Get initial stats object
+ */
+export function getInitialStats(): Stats {
+  return {
+    todayCorrect: 0,
+    todayTotal: 0,
+    lastDate: new Date().toDateString(),
+    totalXP: 0,
+    currentStreak: 0,
+    bestStreak: 0,
+    lastStudyDate: "",
+  };
 }

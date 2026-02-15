@@ -6,15 +6,26 @@ import { LoginButton } from "@/components/common/LoginButton";
 import { QUESTIONS } from "@/data/questions";
 import { CATEGORIES } from "@/data/categories";
 import { L } from "@/lib/i18n";
-import type { QuestionProgress } from "@/lib/storage";
+import {
+  getLevelFromXP,
+  getXPForNextLevel,
+  getLevelProgress,
+  getOverallProgressStats,
+  getCategoryProgressStats,
+  type QuestionProgress,
+  type Stats,
+} from "@/lib/storage";
+import { MASTERED_STREAK_THRESHOLD } from "@/lib/constants";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { Flame, Brain, FolderOpen, TrendingDown, Lightbulb } from "lucide-react";
+import { Flame, Brain, FolderOpen, TrendingDown, Lightbulb, Zap, Trophy } from "lucide-react";
+import { parseSimpleMarkdown } from "@/lib/markdown";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 interface Props {
   progress: Record<string, QuestionProgress>;
-  stats: { todayCorrect: number; todayTotal: number; lastDate: string };
+  stats: Stats;
   user: { id: string; email?: string } | null;
   onStart: () => void;
   onCategoryMode: () => void;
@@ -25,26 +36,30 @@ interface Props {
 export function HomeScreen({ progress, stats, user, onStart, onCategoryMode, onWeakness, onReset }: Props) {
   const { lang, t } = useLang();
   const totalQ = QUESTIONS.length;
-  const mastered = Object.values(progress).filter((p) => p.streak >= 3).length;
-  const dueCount = QUESTIONS.filter((q) => (progress[q.id]?.nextReview || 0) <= Date.now()).length;
+  const { mastered, due: dueCount } = getOverallProgressStats(progress);
 
   const catStats: Record<string, { total: number; mastered: number }> = {};
-  QUESTIONS.forEach((q) => {
-    const cat = CATEGORIES.find((c) => c.id === q.categoryId);
-    const catName = cat ? L(cat.name, lang) : q.categoryId;
-    if (!catStats[catName]) catStats[catName] = { total: 0, mastered: 0 };
-    catStats[catName].total++;
-    if ((progress[q.id]?.streak || 0) >= 3) catStats[catName].mastered++;
+  CATEGORIES.forEach((cat) => {
+    const statsForCat = getCategoryProgressStats(progress, cat.id);
+    if (statsForCat.total > 0) {
+      const catName = L(cat.name, lang);
+      catStats[catName] = { total: statsForCat.total, mastered: statsForCat.mastered };
+    }
   });
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50">
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 dark:from-slate-950 dark:via-slate-900 dark:to-indigo-950">
       <div className="max-w-md mx-auto px-4 py-8 space-y-6">
-        <div className="text-center space-y-2 animate-in">
-          <h1 className="text-4xl font-black bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-            {t.appName}
-          </h1>
-          <p className="text-sm text-muted-foreground">{t.tagline}</p>
+        <div className="flex items-start justify-between animate-in">
+          <div className="flex-1 text-center space-y-2">
+            <h1 className="text-4xl font-black bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400 bg-clip-text text-transparent">
+              {t.appName}
+            </h1>
+            <p className="text-sm text-muted-foreground">{t.tagline}</p>
+          </div>
+          <div className="flex-shrink-0 ml-2">
+            <ThemeToggle />
+          </div>
         </div>
 
         <div className="flex justify-center animate-in" style={{ animationDelay: '0.1s' }}>
@@ -74,7 +89,47 @@ export function HomeScreen({ progress, stats, user, onStart, onCategoryMode, onW
           </CardContent>
         </Card>
 
-        <div className="space-y-3 animate-in" style={{ animationDelay: '0.3s' }}>
+        <div className="grid grid-cols-2 gap-3 animate-in" style={{ animationDelay: '0.3s' }}>
+          <Card className="shadow-md border-indigo-100 hover-lift overflow-hidden">
+            <CardContent className="p-5">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="w-8 h-8 flex items-center justify-center bg-indigo-100 rounded-lg">
+                  <Trophy className="w-4 h-4 text-indigo-600" />
+                </div>
+                <span className="text-xs font-semibold text-indigo-600 uppercase tracking-wide">{t.level}</span>
+              </div>
+              <div className="text-4xl font-black text-indigo-600 mb-1">
+                {getLevelFromXP(stats.totalXP)}
+              </div>
+              <div className="text-xs text-muted-foreground mb-2">
+                {getXPForNextLevel(stats.totalXP)}XP {t.nextLevel}
+              </div>
+              <Progress value={getLevelProgress(stats.totalXP)} className="h-2" />
+            </CardContent>
+          </Card>
+
+          <Card className="shadow-md border-orange-100 hover-lift overflow-hidden">
+            <CardContent className="p-5">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="w-8 h-8 flex items-center justify-center bg-orange-100 rounded-lg">
+                  <Flame className="w-4 h-4 text-orange-600" />
+                </div>
+                <span className="text-xs font-semibold text-orange-600 uppercase tracking-wide">{t.dailyStreak}</span>
+              </div>
+              <div className="flex items-baseline gap-1 mb-1">
+                <div className="text-4xl font-black text-orange-600">
+                  {stats.currentStreak}
+                </div>
+                <div className="text-xl">🔥</div>
+              </div>
+              <div className="text-xs text-muted-foreground">
+                {t.bestStreak}: {stats.bestStreak}{t.streakDays}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        <div className="space-y-3 animate-in" style={{ animationDelay: '0.35s' }}>
           <Button onClick={onStart}
             size="lg"
             className="w-full h-16 rounded-2xl text-lg font-bold shadow-lg hover-lift hover:shadow-2xl transition-all duration-300"
@@ -139,7 +194,7 @@ export function HomeScreen({ progress, stats, user, onStart, onCategoryMode, onW
               </div>
               <div className="flex-1">
                 <h3 className="font-bold text-amber-900 mb-1.5">{t.tipTitle}</h3>
-                <p className="text-sm text-amber-800 leading-relaxed">{t.tipText}</p>
+                <p className="text-sm text-amber-800 leading-relaxed">{parseSimpleMarkdown(t.tipText)}</p>
               </div>
             </div>
           </CardContent>

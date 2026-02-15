@@ -10,13 +10,18 @@ export interface BilingualArray {
   en: string[];
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function L(field: any, lang: Lang): any {
+// Type-safe localization function with overloads
+export function L(field: Bilingual, lang: Lang): string;
+export function L(field: BilingualArray, lang: Lang): string[];
+export function L(field: string, lang: Lang): string;
+export function L(field: string[], lang: Lang): string[];
+export function L(field: Bilingual | BilingualArray | string | string[], lang: Lang): string | string[] {
   if (!field) return "";
   if (typeof field === "string") return field;
   if (Array.isArray(field)) return field;
-  if (field[lang] !== undefined) return field[lang];
-  return field.ko || field.en || "";
+  if (typeof field === "object" && field[lang] !== undefined) return field[lang];
+  if (typeof field === "object") return field.ko || field.en || "";
+  return "";
 }
 
 export const TEXTS: Record<Lang, Record<string, string>> = {
@@ -81,6 +86,29 @@ export const TEXTS: Record<Lang, Record<string, string>> = {
     offline: "오프라인 모드",
     loginWithGitHub: "GitHub으로 로그인",
     logout: "로그아웃",
+    // XP & Level
+    level: "레벨",
+    xpEarned: "XP 획득",
+    totalXP: "총 XP",
+    nextLevel: "다음 레벨까지",
+    levelUp: "레벨 업!",
+    // Streak
+    dailyStreak: "연속 학습",
+    currentStreak: "현재 스트릭",
+    bestStreak: "최고 기록",
+    streakDays: "일",
+    keepItUp: "계속 이어가세요!",
+    streakBroken: "스트릭이 끊겼어요",
+    streakSafe: "스트릭 유지!",
+    // Result feedback
+    greatSession: "훌륭한 세션이었어요!",
+    xpBreakdown: "획득 XP",
+    questionsCorrect: "문제 정답",
+    accuracyRate: "정답률",
+    // Encouragement
+    encouragement1: "매일 조금씩이 큰 차이를 만듭니다!",
+    encouragement2: "꾸준함이 실력을 만듭니다!",
+    encouragement3: "오늘도 한 발짝 전진했어요!",
   },
   en: {
     appName: "AlgoDrill",
@@ -143,5 +171,28 @@ export const TEXTS: Record<Lang, Record<string, string>> = {
     offline: "Offline mode",
     loginWithGitHub: "Login with GitHub",
     logout: "Logout",
+    // XP & Level
+    level: "Level",
+    xpEarned: "XP Earned",
+    totalXP: "Total XP",
+    nextLevel: "to next level",
+    levelUp: "Level Up!",
+    // Streak
+    dailyStreak: "Daily Streak",
+    currentStreak: "Current Streak",
+    bestStreak: "Best Streak",
+    streakDays: " days",
+    keepItUp: "Keep it up!",
+    streakBroken: "Streak broken",
+    streakSafe: "Streak safe!",
+    // Result feedback
+    greatSession: "Great session!",
+    xpBreakdown: "XP Earned",
+    questionsCorrect: "Questions Correct",
+    accuracyRate: "Accuracy",
+    // Encouragement
+    encouragement1: "Small daily progress makes a big difference!",
+    encouragement2: "Consistency builds mastery!",
+    encouragement3: "One step forward today!",
   },
 };
