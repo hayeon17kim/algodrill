@@ -24,21 +24,21 @@ export function FillBlankQuestion({ q, onAnswer }: { q: FBQ; onAnswer: (correct:
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-2 text-sm font-semibold text-green-600 bg-green-50 px-3 py-2 rounded-lg w-fit">
+      <div className="flex items-center gap-2 text-sm font-semibold text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-950 px-3 py-2 rounded-lg w-fit">
         <Code2 className="w-4 h-4" />
         {t.fillBlank}
       </div>
-      <Card className="p-6 shadow-lg border-2 border-green-100">
-        <p className="text-xl font-bold text-gray-900 leading-relaxed">{L(q.question, lang)}</p>
+      <Card className="p-6">
+        <p className="text-xl font-bold leading-relaxed">{L(q.question, lang)}</p>
       </Card>
-      <Card className="p-0 overflow-hidden shadow-lg border-2 border-gray-700">
-        <pre className="bg-gray-900 text-green-400 p-5 text-sm overflow-x-auto leading-relaxed font-mono whitespace-pre-wrap">{q.code}</pre>
+      <Card className="p-0 overflow-hidden border-2 border-gray-700 dark:border-gray-600">
+        <pre className="bg-gray-900 dark:bg-gray-950 text-green-400 p-5 text-sm overflow-x-auto leading-relaxed font-mono whitespace-pre-wrap">{q.code}</pre>
       </Card>
       <div className="space-y-5">
         {q.blanks.map((blank, bi) => (
           <div key={bi} className="space-y-3">
-            <p className="text-sm font-bold text-gray-700 flex items-center gap-2">
-              <span className="w-6 h-6 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-xs font-black">
+            <p className="text-sm font-bold flex items-center gap-2">
+              <span className="w-6 h-6 rounded-full bg-secondary text-primary flex items-center justify-center text-xs font-bold">
                 {bi + 1}
               </span>
               {L(blank.placeholder, lang)}
@@ -54,19 +54,19 @@ export function FillBlankQuestion({ q, onAnswer }: { q: FBQ; onAnswer: (correct:
 
                   if (!revealed) {
                     return base + (isSelected
-                      ? "border-indigo-500 bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-200 shadow-sm"
-                      : "border-gray-200 bg-white dark:bg-gray-800 hover:border-indigo-300 hover:bg-indigo-50 dark:hover:bg-indigo-950");
+                      ? "border-primary bg-primary/10 text-primary"
+                      : "border-border bg-card hover:bg-accent");
                   }
 
                   if (isCorrectAnswer) {
-                    return base + "border-green-500 bg-green-50 dark:bg-green-950 text-green-800 dark:text-green-200 shadow-md";
+                    return base + "border-green-500 bg-green-50 dark:bg-green-950 text-green-800 dark:text-green-200";
                   }
 
                   if (isWrongSelection) {
-                    return base + "border-red-400 bg-red-50 dark:bg-red-950 text-red-700 dark:text-red-200 shadow-md";
+                    return base + "border-red-400 bg-red-50 dark:bg-red-950 text-red-700 dark:text-red-200";
                   }
 
-                  return base + "border-gray-200 bg-gray-50 dark:bg-gray-900 text-gray-400 dark:text-gray-600 opacity-50";
+                  return base + "border-border bg-muted text-muted-foreground opacity-50";
                 };
 
                 return (
@@ -88,14 +88,13 @@ export function FillBlankQuestion({ q, onAnswer }: { q: FBQ; onAnswer: (correct:
         <Button
           onClick={() => setRevealed(true)}
           size="lg"
-          className="w-full h-14 rounded-xl font-bold text-lg shadow-lg "
-          
+          className="w-full h-14 font-bold text-lg"
         >
           {t.checkAnswer}
         </Button>
       )}
       {revealed && (
-        <div className="space-y-4 ">
+        <div className="space-y-4">
           <ResultCard
             variant={allCorrect ? "success" : "error"}
             icon={allCorrect ? "check" : "alert"}
@@ -105,8 +104,7 @@ export function FillBlankQuestion({ q, onAnswer }: { q: FBQ; onAnswer: (correct:
           </ResultCard>
           <Button
             size="lg"
-            className="w-full h-14 rounded-xl font-bold text-lg shadow-lg  transition-all"
-            
+            className="w-full h-14 font-bold text-lg"
             onClick={() => onAnswer(allCorrect)}
           >
             {t.next}
