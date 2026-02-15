@@ -7,6 +7,7 @@ import { HomeScreen } from "@/components/screens/HomeScreen";
 import { CategoryScreen } from "@/components/screens/CategoryScreen";
 import { SessionScreen, type SessionResult } from "@/components/screens/SessionScreen";
 import { ResultScreen } from "@/components/screens/ResultScreen";
+import { WeaknessDashboard } from "@/components/screens/WeaknessDashboard";
 import { CATEGORIES } from "@/data/categories";
 import { QUESTIONS, type Question } from "@/data/questions";
 import { L, TEXTS, type Lang } from "@/lib/i18n";
@@ -20,8 +21,9 @@ import {
   type QuestionProgress,
   type AppState,
 } from "@/lib/storage";
+import { getCurrentUser, onAuthStateChange } from "@/lib/supabase";
 
-type Screen = "home" | "category" | "session" | "result";
+type Screen = "home" | "category" | "session" | "result" | "weakness";
 
 export default function AlgoDrillApp() {
   const [lang, setLang] = useState<Lang>(() => {
@@ -48,6 +50,27 @@ export default function AlgoDrillApp() {
     return saved?.stats || { todayCorrect: 0, todayTotal: 0, lastDate: new Date().toDateString() };
   });
 
+  const [user, setUser] = useState<{ id: string; email?: string } | null>(null);
+
+  // Load initial auth state
+  useEffect(() => {
+    getCurrentUser().then((u) => {
+      if (u) setUser({ id: u.id, email: u.email });
+    });
+
+    const unsubscribe = onAuthStateChange((userId) => {
+      if (userId) {
+        getCurrentUser().then((u) => {
+          if (u) setUser({ id: u.id, email: u.email });
+        });
+      } else {
+        setUser(null);
+      }
+    });
+
+    return unsubscribe;
+  }, []);
+
   // Persist to localStorage
   useEffect(() => {
     saveLocal({ progress, stats, lang });
@@ -63,9 +86,9 @@ export default function AlgoDrillApp() {
 
   // Background Supabase sync (fire and forget)
   useEffect(() => {
-    const userId = "anonymous"; // TODO: replace with real auth
+    const userId = user?.id || "anonymous";
     syncToServer(userId, progress).catch(() => {});
-  }, [progress]);
+  }, [progress, user]);
 
   const startSession = useCallback(
     (categoryFilter: string | null = null) => {
@@ -138,8 +161,10 @@ export default function AlgoDrillApp() {
           <HomeScreen
             progress={progress}
             stats={stats}
+            user={user}
             onStart={() => startSession(null)}
             onCategoryMode={() => setScreen("category")}
+            onWeakness={() => setScreen("weakness")}
             onReset={handleReset}
           />
         )}
@@ -148,6 +173,19 @@ export default function AlgoDrillApp() {
             progress={progress}
             onSelectCategory={handleCategorySelect}
             onBack={() => setScreen("home")}
+          />
+        )}
+        {screen === "weakness" && (
+          <WeaknessDashboard
+            progress={progress}
+            onBack={() => setScreen("home")}
+            onFocusCategory={(catId) => {
+              const started = startSession(catId);
+              if (!started) {
+                const t = TEXTS[lang];
+                alert(t.noCategoryQuestions);
+              }
+            }}
           />
         )}
         {screen === "session" && (
