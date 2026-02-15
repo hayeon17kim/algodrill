@@ -108,6 +108,7 @@ export default function AlgoDrillApp() {
             questions={sessionQuestions}
             progress={progress}
             onComplete={completeSession}
+            onCancel={() => setScreen("home")}
             categoryName={sessionCategoryName}
           />
         )}

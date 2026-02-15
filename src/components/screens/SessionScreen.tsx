@@ -9,7 +9,8 @@ import { updateProgress, type QuestionProgress } from "@/lib/storage";
 import type { Question } from "@/data/questions";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Star } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Star, X } from "lucide-react";
 
 export interface SessionResult {
   questionId: string;
@@ -20,10 +21,11 @@ interface Props {
   questions: Question[];
   progress: Record<string, QuestionProgress>;
   onComplete: (newProgress: Record<string, QuestionProgress>, results: SessionResult[]) => void;
+  onCancel?: () => void;
   categoryName: string | null;
 }
 
-export function SessionScreen({ questions, progress, onComplete, categoryName }: Props) {
+export function SessionScreen({ questions, progress, onComplete, onCancel, categoryName }: Props) {
   const { lang, t } = useLang();
   const [idx, setIdx] = useState(0);
   const [sp, setSp] = useState(progress);
@@ -39,19 +41,39 @@ export function SessionScreen({ questions, progress, onComplete, categoryName }:
     else setIdx(idx + 1);
   };
 
+  const handleCancel = () => {
+    if (onCancel) {
+      const confirmMessage = lang === "ko"
+        ? "진행 중인 세션을 종료하시겠습니까? 진행 상황이 저장되지 않습니다."
+        : "Are you sure you want to quit? Your progress will not be saved.";
+      if (confirm(confirmMessage)) {
+        onCancel();
+      }
+    }
+  };
+
   const q = questions[idx];
   const cat = CATEGORIES.find((c) => c.id === q.categoryId);
 
   return (
     <div className="min-h-screen bg-background">
       <div className="max-w-md mx-auto px-4 py-6 space-y-6">
-        {categoryName && (
-          <div className="animate-in">
-            <Badge variant="secondary" className="text-xs font-semibold  px-3 py-1.5">
-              {categoryName}
-            </Badge>
+        <div className="flex items-center justify-between animate-in">
+          <div className="flex items-center gap-2">
+            {categoryName && (
+              <Badge variant="secondary" className="text-xs font-semibold  px-3 py-1.5">
+                {categoryName}
+              </Badge>
+            )}
           </div>
-        )}
+          {onCancel && (
+            <Button variant="ghost" size="sm" onClick={handleCancel} className="gap-1">
+              <X className="w-4 h-4" />
+              {lang === "ko" ? "종료" : "Quit"}
+            </Button>
+          )}
+        </div>
+
         <div className="flex items-center gap-3">
           <span className="text-sm text-muted-foreground font-semibold tabular-nums min-w-[3rem]">
             {idx + 1}/{questions.length}

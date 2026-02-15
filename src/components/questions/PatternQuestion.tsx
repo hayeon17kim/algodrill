@@ -4,8 +4,8 @@ import { useState } from "react";
 import { useLang } from "@/components/common/LangContext";
 import { L } from "@/lib/i18n";
 import type { PatternQuestion as PQ } from "@/data/questions";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import { QuestionLayout } from "./QuestionLayout";
+import { PrimaryActionButton } from "@/components/common/PrimaryActionButton";
 import { ResultCard } from "@/components/common/ResultCard";
 import { Target, CheckCircle, XCircle, Mic } from "lucide-react";
 import { typeBadgeColors, stateColors, iconColors } from "@/lib/questionStyles";
@@ -21,14 +21,12 @@ export function PatternQuestion({ q, onAnswer }: { q: PQ; onAnswer: (correct: bo
   const correct = selected === q.answer;
 
   return (
-    <div className="space-y-6">
-      <div className={`flex items-center gap-2 text-sm font-semibold ${typeBadgeColors.pattern} px-3 py-2 rounded-lg w-fit`}>
-        <Target className="w-4 h-4" />
-        {t.patternRecog}
-      </div>
-      <Card className="p-6 shadow-lg border">
-        <p className="text-xl font-bold leading-relaxed">{L(q.question, lang)}</p>
-      </Card>
+    <QuestionLayout
+      badgeIcon={<Target className="w-4 h-4" />}
+      badgeLabel={t.patternRecog}
+      badgeColorClass={typeBadgeColors.pattern}
+      question={q.question}
+    >
       <div className="space-y-3">
         {q.options.map((opt, i) => {
           const isCorrectAnswer = i === q.answer;
@@ -74,16 +72,11 @@ export function PatternQuestion({ q, onAnswer }: { q: PQ; onAnswer: (correct: bo
               </div>
             </ResultCard>
           )}
-          <Button
-            size="lg"
-            className="w-full h-14 rounded-xl font-bold text-lg shadow-lg  transition-all"
-            
-            onClick={() => onAnswer(correct)}
-          >
+          <PrimaryActionButton onClick={() => onAnswer(correct)}>
             {t.next}
-          </Button>
+          </PrimaryActionButton>
         </div>
       )}
-    </div>
+    </QuestionLayout>
   );
 }
