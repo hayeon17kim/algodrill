@@ -126,3 +126,172 @@ export function updateProgress(
   }
   return p;
 }
+
+// ─── Analytics & Weakness Detection ─────────────────────────
+export interface CategoryStats {
+  categoryId: string;
+  total: number;
+  correct: number;
+  accuracy: number; // 0-100
+}
+
+export interface TypeStats {
+  type: string;
+  total: number;
+  correct: number;
+  accuracy: number;
+}
+
+export interface DifficultyStats {
+  difficulty: number;
+  total: number;
+  correct: number;
+  accuracy: number;
+}
+
+export interface WeaknessInsight {
+  categoryId: string;
+  accuracy: number;
+  recentErrors: number; // last 7 days
+}
+
+/**
+ * Calculate accuracy by category
+ */
+export function getCategoryStats(progress: Record<string, QuestionProgress>): CategoryStats[] {
+  const categoryMap: Record<string, { total: number; correct: number }> = {};
+
+  QUESTIONS.forEach((q) => {
+    const p = progress[q.id];
+    if (!p || !p.lastSeen) return; // not attempted yet
+
+    if (!categoryMap[q.categoryId]) {
+      categoryMap[q.categoryId] = { total: 0, correct: 0 };
+    }
+    categoryMap[q.categoryId].total++;
+    // Streak > 0 means last attempt was correct
+    if (p.streak > 0) {
+      categoryMap[q.categoryId].correct++;
+    }
+  });
+
+  return Object.entries(categoryMap).map(([categoryId, stats]) => ({
+    categoryId,
+    total: stats.total,
+    correct: stats.correct,
+    accuracy: stats.total > 0 ? Math.round((stats.correct / stats.total) * 100) : 0,
+  }));
+}
+
+/**
+ * Calculate accuracy by question type
+ */
+export function getTypeStats(progress: Record<string, QuestionProgress>): TypeStats[] {
+  const typeMap: Record<string, { total: number; correct: number }> = {};
+
+  QUESTIONS.forEach((q) => {
+    const p = progress[q.id];
+    if (!p || !p.lastSeen) return;
+
+    if (!typeMap[q.type]) {
+      typeMap[q.type] = { total: 0, correct: 0 };
+    }
+    typeMap[q.type].total++;
+    if (p.streak > 0) {
+      typeMap[q.type].correct++;
+    }
+  });
+
+  return Object.entries(typeMap).map(([type, stats]) => ({
+    type,
+    total: stats.total,
+    correct: stats.correct,
+    accuracy: stats.total > 0 ? Math.round((stats.correct / stats.total) * 100) : 0,
+  }));
+}
+
+/**
+ * Calculate accuracy by difficulty
+ */
+export function getDifficultyStats(progress: Record<string, QuestionProgress>): DifficultyStats[] {
+  const diffMap: Record<number, { total: number; correct: number }> = {};
+
+  QUESTIONS.forEach((q) => {
+    const p = progress[q.id];
+    if (!p || !p.lastSeen) return;
+
+    if (!diffMap[q.difficulty]) {
+      diffMap[q.difficulty] = { total: 0, correct: 0 };
+    }
+    diffMap[q.difficulty].total++;
+    if (p.streak > 0) {
+      diffMap[q.difficulty].correct++;
+    }
+  });
+
+  return Object.entries(diffMap).map(([diff, stats]) => ({
+    difficulty: Number(diff),
+    total: stats.total,
+    correct: stats.correct,
+    accuracy: stats.total > 0 ? Math.round((stats.correct / stats.total) * 100) : 0,
+  }));
+}
+
+/**
+ * Find weak categories from last 7 days
+ */
+export function getWeakCategories(progress: Record<string, QuestionProgress>): WeaknessInsight[] {
+  const sevenDaysAgo = Date.now() - 7 * 24 * 3600000;
+  const categoryMap: Record<string, { total: number; correct: number; recentErrors: number }> = {};
+
+  QUESTIONS.forEach((q) => {
+    const p = progress[q.id];
+    if (!p || !p.lastSeen) return;
+
+    if (!categoryMap[q.categoryId]) {
+      categoryMap[q.categoryId] = { total: 0, correct: 0, recentErrors: 0 };
+    }
+
+    // Overall stats
+    categoryMap[q.categoryId].total++;
+    if (p.streak > 0) {
+      categoryMap[q.categoryId].correct++;
+    }
+
+    // Recent errors (last 7 days)
+    if (p.lastSeen >= sevenDaysAgo && p.streak === 0) {
+      categoryMap[q.categoryId].recentErrors++;
+    }
+  });
+
+  const insights = Object.entries(categoryMap)
+    .map(([categoryId, stats]) => ({
+      categoryId,
+      accuracy: stats.total > 0 ? Math.round((stats.correct / stats.total) * 100) : 0,
+      recentErrors: stats.recentErrors,
+    }))
+    .filter((insight) => insight.accuracy < 100); // Only show categories with room for improvement
+
+  // Sort by: 1) recent errors descending, 2) accuracy ascending
+  return insights.sort((a, b) => {
+    if (b.recentErrors !== a.recentErrors) return b.recentErrors - a.recentErrors;
+    return a.accuracy - b.accuracy;
+  });
+}
+
+/**
+ * Get overall accuracy
+ */
+export function getOverallAccuracy(progress: Record<string, QuestionProgress>): number {
+  let total = 0;
+  let correct = 0;
+
+  QUESTIONS.forEach((q) => {
+    const p = progress[q.id];
+    if (!p || !p.lastSeen) return;
+    total++;
+    if (p.streak > 0) correct++;
+  });
+
+  return total > 0 ? Math.round((correct / total) * 100) : 0;
+}

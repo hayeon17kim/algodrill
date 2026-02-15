@@ -45,8 +45,32 @@ CREATE TRIGGER trg_questions_updated
   BEFORE UPDATE ON questions
   FOR EACH ROW EXECUTE FUNCTION update_updated_at();
 
+-- User analytics/stats table (for caching computed stats)
+CREATE TABLE IF NOT EXISTS user_stats (
+  user_id TEXT PRIMARY KEY,
+  overall_accuracy INTEGER DEFAULT 0,
+  category_stats JSONB DEFAULT '{}',
+  type_stats JSONB DEFAULT '{}',
+  difficulty_stats JSONB DEFAULT '{}',
+  weak_categories JSONB DEFAULT '[]',
+  last_computed TIMESTAMPTZ DEFAULT NOW(),
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_user_stats_user ON user_stats (user_id);
+
+CREATE TRIGGER trg_user_stats_updated
+  BEFORE UPDATE ON user_stats
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at();
+
 -- Row Level Security (enable when using Supabase Auth)
 -- ALTER TABLE user_progress ENABLE ROW LEVEL SECURITY;
 -- CREATE POLICY "Users can manage own progress"
 --   ON user_progress FOR ALL
+--   USING (auth.uid()::text = user_id);
+
+-- ALTER TABLE user_stats ENABLE ROW LEVEL SECURITY;
+-- CREATE POLICY "Users can manage own stats"
+--   ON user_stats FOR ALL
 --   USING (auth.uid()::text = user_id);
