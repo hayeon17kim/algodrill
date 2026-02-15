@@ -4,6 +4,9 @@ import { useState } from "react";
 import { useLang } from "@/components/common/LangContext";
 import { L } from "@/lib/i18n";
 import type { ApproachQuestion as AQ } from "@/data/questions";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { ListOrdered, CheckCircle, XCircle, Undo2 } from "lucide-react";
 
 export function ApproachQuestion({ q, onAnswer }: { q: AQ; onAnswer: (correct: boolean) => void }) {
   const { lang, t } = useLang();
@@ -36,9 +39,14 @@ export function ApproachQuestion({ q, onAnswer }: { q: AQ; onAnswer: (correct: b
   const stepResults = userOrder.map((item, i) => item.correctIdx === i);
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center gap-2 text-sm font-medium text-purple-600">📊 {t.approachOrder}</div>
-      <p className="text-lg font-semibold text-gray-900 leading-relaxed">{L(q.question, lang)}</p>
+    <div className="space-y-6">
+      <div className="flex items-center gap-2 text-sm font-semibold text-purple-600 bg-purple-50 px-3 py-2 rounded-lg w-fit">
+        <ListOrdered className="w-4 h-4" />
+        {t.approachOrder}
+      </div>
+      <Card className="p-6 shadow-lg border-2 border-purple-100">
+        <p className="text-xl font-bold text-gray-900 leading-relaxed">{L(q.question, lang)}</p>
+      </Card>
       {userOrder.length > 0 && (
         <div className="space-y-1.5">
           <p className="text-xs font-medium text-gray-500">{t.myOrder}</p>
