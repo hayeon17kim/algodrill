@@ -79,6 +79,8 @@ export const TEXTS: Record<Lang, Record<string, string>> = {
     categorySession: "카테고리 학습",
     synced: "서버에 저장됨",
     offline: "오프라인 모드",
+    loginWithGitHub: "GitHub으로 로그인",
+    logout: "로그아웃",
   },
   en: {
     appName: "AlgoDrill",
@@ -139,5 +141,7 @@ export const TEXTS: Record<Lang, Record<string, string>> = {
     categorySession: "Category Session",
     synced: "Synced to server",
     offline: "Offline mode",
+    loginWithGitHub: "Login with GitHub",
+    logout: "Logout",
   },
 };
