@@ -7,10 +7,9 @@ import { L } from "@/lib/i18n";
 import { CATEGORIES } from "@/data/categories";
 import { updateProgress, type QuestionProgress } from "@/lib/storage";
 import type { Question } from "@/data/questions";
-import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
-import { Star, X } from "lucide-react";
+import { Star, X, Heart } from "lucide-react";
 
 export interface SessionResult {
   questionId: string;
@@ -54,48 +53,46 @@ export function SessionScreen({ questions, progress, onComplete, onCancel, categ
 
   const q = questions[idx];
   const cat = CATEGORIES.find((c) => c.id === q.categoryId);
+  const correctCount = results.filter(r => r.correct).length;
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="max-w-md mx-auto px-4 py-6 space-y-6">
-        <div className="flex items-center justify-between animate-in">
-          <div className="flex items-center gap-2">
-            {categoryName && (
-              <Badge variant="secondary" className="text-xs font-semibold  px-3 py-1.5">
-                {categoryName}
-              </Badge>
+      {/* Duolingo-style top bar with progress */}
+      <div className="sticky top-0 z-10 bg-card border-b-2 border-border">
+        <div className="max-w-lg mx-auto px-4 py-3">
+          <div className="flex items-center gap-3">
+            {onCancel && (
+              <button onClick={handleCancel} className="text-muted-foreground hover:text-foreground transition-colors">
+                <X className="w-6 h-6" strokeWidth={3} />
+              </button>
             )}
-          </div>
-          {onCancel && (
-            <Button variant="ghost" size="sm" onClick={handleCancel} className="gap-1">
-              <X className="w-4 h-4" />
-              {lang === "ko" ? "종료" : "Quit"}
-            </Button>
-          )}
-        </div>
-
-        <div className="flex items-center gap-3">
-          <span className="text-sm text-muted-foreground font-semibold tabular-nums min-w-[3rem]">
-            {idx + 1}/{questions.length}
-          </span>
-          <div className="flex-1 relative">
-            <Progress value={((idx + 1) / questions.length) * 100} className="h-3 shadow-sm" />
-            <div className="absolute right-0 -top-6 text-xs font-bold text-primary">
-              {Math.round(((idx + 1) / questions.length) * 100)}%
+            <div className="flex-1">
+              <Progress value={((idx + 1) / questions.length) * 100} className="h-4" />
+            </div>
+            <div className="flex items-center gap-1 text-destructive font-extrabold text-sm">
+              <Heart className="w-5 h-5 fill-destructive" />
+              <span>{questions.length - (results.length - correctCount)}</span>
             </div>
           </div>
         </div>
-        <div className="flex items-center gap-2 animate-in" style={{ animationDelay: '0.2s' }}>
-          <Badge variant="secondary" className=" px-3 py-1.5 font-semibold">
-            {cat?.icon} {cat ? L(cat.name, lang) : ""}
-          </Badge>
-          <Badge variant="outline" className="gap-1 px-2.5 py-1.5 border-amber-300 bg-amber-50 dark:bg-amber-950 dark:border-amber-800">
+      </div>
+
+      <div className="max-w-lg mx-auto px-4 py-6 space-y-5">
+        {/* Category and difficulty pills */}
+        <div className="flex items-center gap-2 animate-slide-up">
+          <div className="flex items-center gap-1.5 text-sm font-extrabold text-muted-foreground bg-secondary px-3 py-1.5 rounded-xl">
+            <span>{cat?.icon}</span>
+            <span>{cat ? L(cat.name, lang) : ""}</span>
+          </div>
+          <div className="flex items-center gap-0.5 bg-warning/10 px-2.5 py-1.5 rounded-xl">
             {Array.from({ length: q.difficulty }).map((_, i) => (
-              <Star key={i} className="w-3.5 h-3.5 fill-amber-400 text-amber-400 dark:fill-amber-500 dark:text-amber-500" />
+              <Star key={i} className="w-3.5 h-3.5 fill-warning text-warning" />
             ))}
-          </Badge>
+          </div>
         </div>
-        <div>
+
+        {/* Question content */}
+        <div className="animate-slide-up">
           <QuestionRenderer question={q} onAnswer={handleAnswer} key={q.id + idx} />
         </div>
       </div>

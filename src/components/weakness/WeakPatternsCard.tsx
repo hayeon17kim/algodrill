@@ -1,7 +1,7 @@
 "use client";
 
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle, ChevronRight } from "lucide-react";
 import { CATEGORIES } from "@/data/categories";
 import { L } from "@/lib/i18n";
 import type { WeaknessInsight } from "@/lib/storage";
@@ -16,14 +16,14 @@ export function WeakPatternsCard({ weakCategories, lang, onFocusCategory }: Weak
   if (weakCategories.length === 0) return null;
 
   return (
-    <Card className="mb-6 border-destructive/50 bg-destructive/5">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-destructive">
+    <Card className="border-destructive/30 bg-destructive/5">
+      <CardHeader className="pb-3">
+        <CardTitle className="flex items-center gap-2 text-destructive text-base font-extrabold uppercase tracking-wider">
           <AlertTriangle className="w-5 h-5" />
-          {lang === "ko" ? "최근 7일 취약 패턴 Top 3" : "Weak Patterns (Last 7 Days)"}
+          {lang === "ko" ? "취약 패턴 Top 3" : "Weak Patterns"}
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-3">
+      <CardContent className="space-y-2">
         {weakCategories.map((weak, idx) => {
           const cat = CATEGORIES.find((c) => c.id === weak.categoryId);
           if (!cat) return null;
@@ -32,26 +32,24 @@ export function WeakPatternsCard({ weakCategories, lang, onFocusCategory }: Weak
             <button
               key={weak.categoryId}
               onClick={() => onFocusCategory(weak.categoryId)}
-              className="w-full bg-card rounded-lg p-4 flex items-center justify-between hover:bg-accent transition-colors border"
+              className="option-tile w-full"
             >
               <div className="flex items-center gap-3">
-                <div className="text-2xl font-bold text-destructive">
-                  #{idx + 1}
+                <div className="w-8 h-8 rounded-xl bg-destructive text-destructive-foreground flex items-center justify-center font-black text-sm">
+                  {idx + 1}
                 </div>
                 <div className="text-xl">{cat.icon}</div>
-                <div className="text-left">
-                  <div className="font-semibold">{L(cat.name, lang)}</div>
-                  <div className="text-sm text-muted-foreground">
+                <div className="text-left flex-1">
+                  <div className="font-extrabold">{L(cat.name, lang)}</div>
+                  <div className="text-xs font-bold text-muted-foreground">
                     {lang === "ko" ? "최근 오답" : "Recent errors"}: {weak.recentErrors}
                   </div>
                 </div>
-              </div>
-              <div className="text-right">
-                <div className="text-2xl font-bold text-destructive">
-                  {weak.accuracy}%
-                </div>
-                <div className="text-xs text-muted-foreground">
-                  {lang === "ko" ? "정답률" : "accuracy"}
+                <div className="text-right flex items-center gap-1">
+                  <div className="text-xl font-black text-destructive">
+                    {weak.accuracy}%
+                  </div>
+                  <ChevronRight className="w-4 h-4 text-muted-foreground" />
                 </div>
               </div>
             </button>

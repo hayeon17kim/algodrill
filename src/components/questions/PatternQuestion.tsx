@@ -32,19 +32,18 @@ export function PatternQuestion({ q, onAnswer }: { q: PQ; onAnswer: (correct: bo
           const isCorrectAnswer = i === q.answer;
           const isUserSelection = i === selected;
 
-          let cls = "w-full text-left p-5 rounded-xl border-2 transition-all font-semibold text-base ";
-
+          let cls: string;
           if (!revealed) {
-            cls += "border-border bg-card hover:bg-accent shadow-sm";
+            cls = stateColors.hover;
           } else if (isCorrectAnswer) {
-            cls += `${stateColors.correct} shadow-md`;
+            cls = stateColors.correct;
           } else if (isUserSelection) {
-            cls += `${stateColors.incorrect} shadow-md`;
+            cls = stateColors.incorrect;
           } else {
-            cls += `${stateColors.disabled}`;
+            cls = stateColors.disabled;
           }
           return (
-            <button key={i} className={cls} onClick={() => handleSelect(i)} disabled={revealed}>
+            <button key={i} className={`w-full text-left text-base ${cls}`} onClick={() => handleSelect(i)} disabled={revealed}>
               <div className="flex items-center justify-between">
                 <span>{opt}</span>
                 {revealed && i === q.answer && <CheckCircle className={`w-5 h-5 ${iconColors.correct} flex-shrink-0`} />}
@@ -55,20 +54,20 @@ export function PatternQuestion({ q, onAnswer }: { q: PQ; onAnswer: (correct: bo
         })}
       </div>
       {revealed && (
-        <div className="space-y-4 ">
+        <div className="space-y-4 animate-slide-up">
           <ResultCard
             variant={correct ? "success" : "error"}
             icon={correct ? "check" : "x"}
             title={correct ? t.correctAnswer : t.wrongAnswer}
           >
-            <p className="text-gray-700 dark:text-gray-300">{L(q.explanation, lang)}</p>
+            <p className="text-muted-foreground">{L(q.explanation, lang)}</p>
           </ResultCard>
 
           {q.speakingTip && (
             <ResultCard variant="info" title={t.sayThis}>
-              <div className="flex items-center gap-2 text-blue-900 dark:text-blue-100">
-                <Mic className="w-4 h-4 flex-shrink-0" />
-                <p className="italic">{L(q.speakingTip, lang)}</p>
+              <div className="flex items-center gap-2">
+                <Mic className="w-4 h-4 flex-shrink-0 text-info" />
+                <p className="italic text-muted-foreground">{L(q.speakingTip, lang)}</p>
               </div>
             </ResultCard>
           )}

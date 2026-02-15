@@ -50,18 +50,18 @@ export function ApproachQuestion({ q, onAnswer }: { q: AQ; onAnswer: (correct: b
     >
       {userOrder.length > 0 && (
         <div className="space-y-3">
-          <p className="text-sm font-semibold">{t.myOrder}</p>
+          <p className="text-xs font-extrabold uppercase tracking-widest text-muted-foreground">{t.myOrder}</p>
           <div className="space-y-2">
             {userOrder.map((item, i) => (
-              <div key={i} className={`p-4 rounded-lg text-sm flex items-center gap-3 border ${
+              <div key={i} className={`text-sm flex items-center gap-3 ${
                 revealed
                   ? stepResults[i]
                     ? stateColors.correct
                     : stateColors.incorrect
                   : stateColors.neutral
               }`}>
-                <span className="font-bold text-base w-7 h-7 flex items-center justify-center bg-card rounded-lg">{i + 1}</span>
-                <span className="flex-1 font-medium">{item.text}</span>
+                <span className="font-black text-base w-8 h-8 flex items-center justify-center bg-secondary rounded-xl">{i + 1}</span>
+                <span className="flex-1 font-bold">{item.text}</span>
                 {revealed && (
                   stepResults[i] ?
                     <CheckCircle className={`w-5 h-5 ${iconColors.correct}`} /> :
@@ -80,13 +80,13 @@ export function ApproachQuestion({ q, onAnswer }: { q: AQ; onAnswer: (correct: b
       )}
       {!revealed && remaining.length > 0 && (
         <div className="space-y-3">
-          <p className="text-sm font-semibold">{t.tapToSelect}</p>
+          <p className="text-xs font-extrabold uppercase tracking-widest text-muted-foreground">{t.tapToSelect}</p>
           <div className="space-y-2">
             {remaining.map((idx: number) => (
               <button
                 key={idx}
                 onClick={() => handlePick(idx)}
-                className="w-full text-left p-4 rounded-lg text-sm font-medium border bg-card hover:bg-accent transition-colors"
+                className="option-tile w-full text-left text-sm"
               >
                 {shuffled[idx].text}
               </button>
@@ -100,19 +100,19 @@ export function ApproachQuestion({ q, onAnswer }: { q: AQ; onAnswer: (correct: b
         </PrimaryActionButton>
       )}
       {revealed && (
-        <div className="space-y-4">
+        <div className="space-y-4 animate-slide-up">
           <ResultCard
             variant={isCorrect ? "success" : "error"}
             icon="check"
             title={isCorrect ? t.perfect : t.checkOrder}
           >
-            <p className="text-gray-700 dark:text-gray-300">{L(q.explanation, lang)}</p>
+            <p className="text-muted-foreground">{L(q.explanation, lang)}</p>
             {!isCorrect && (
-              <div className="mt-4 p-3 bg-card rounded-lg space-y-2">
-                <p className="text-xs font-bold uppercase tracking-wider">{t.correctOrder}</p>
+              <div className="mt-4 p-3 bg-card rounded-xl space-y-2">
+                <p className="text-xs font-extrabold uppercase tracking-widest">{t.correctOrder}</p>
                 {steps.map((s: string, i: number) => (
                   <div key={i} className="flex items-start gap-2 text-sm">
-                    <span className="font-bold text-primary min-w-[1.5rem]">{i + 1}.</span>
+                    <span className="font-black text-primary min-w-[1.5rem]">{i + 1}.</span>
                     <span>{s}</span>
                   </div>
                 ))}

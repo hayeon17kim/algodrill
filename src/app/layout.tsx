@@ -1,9 +1,9 @@
 import type { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
+import { Nunito } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/ui/theme-provider";
 
-const inter = Inter({ subsets: ["latin"] });
+const nunito = Nunito({ subsets: ["latin"], variable: "--font-nunito", weight: ["400", "600", "700", "800", "900"] });
 
 export const metadata: Metadata = {
   title: "AlgoDrill — 라이브 코딩 면접 준비",
@@ -21,16 +21,16 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
-  themeColor: "#10b981",
+  themeColor: "#58CC02",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="ko" suppressHydrationWarning>
+    <html lang="ko" suppressHydrationWarning className={`${nunito.variable} antialiased`}>
       <head>
         <link rel="apple-touch-icon" href="/icon-192.png" />
       </head>
-      <body className={`${inter.className} select-none`}>
+      <body className="select-none">
         <ThemeProvider defaultTheme="light" storageKey="algodrill-theme">
           {children}
         </ThemeProvider>

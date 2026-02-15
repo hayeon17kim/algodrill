@@ -4,58 +4,78 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 0 0% 3.9%;
+    /* Duolingo-inspired vibrant design system */
+    --background: 0 0% 97%;
+    --foreground: 220 20% 20%;
     --card: 0 0% 100%;
-    --card-foreground: 0 0% 3.9%;
+    --card-foreground: 220 20% 20%;
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 3.9%;
-    --primary: 142.1 76.2% 36.3%;
-    --primary-foreground: 355.7 100% 97.3%;
-    --secondary: 0 0% 96.1%;
-    --secondary-foreground: 0 0% 9%;
-    --muted: 0 0% 96.1%;
-    --muted-foreground: 0 0% 45.1%;
-    --accent: 0 0% 96.1%;
-    --accent-foreground: 0 0% 9%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 89.8%;
-    --input: 0 0% 89.8%;
-    --ring: 142.1 76.2% 36.3%;
-    --radius: 0.5rem;
-    --chart-1: 12 76% 61%;
-    --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
+    --popover-foreground: 220 20% 20%;
+    /* Signature Duolingo green */
+    --primary: 102 78% 40%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 220 10% 94%;
+    --secondary-foreground: 220 20% 25%;
+    --muted: 220 10% 94%;
+    --muted-foreground: 220 10% 50%;
+    --accent: 220 10% 94%;
+    --accent-foreground: 220 20% 20%;
+    /* Warm red for destructive / errors */
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 220 13% 88%;
+    --input: 220 13% 88%;
+    --ring: 102 78% 40%;
+    --radius: 1rem;
+    /* Gamification accent colors */
+    --success: 102 78% 40%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+    --info: 210 100% 52%;
+    --info-foreground: 0 0% 100%;
+    --streak: 25 95% 53%;
+    --xp: 102 78% 40%;
+    --chart-1: 102 78% 40%;
+    --chart-2: 38 92% 50%;
+    --chart-3: 210 100% 52%;
+    --chart-4: 0 72% 51%;
+    --chart-5: 270 60% 55%;
   }
 
   .dark {
-    --background: 0 0% 3.9%;
-    --foreground: 0 0% 98%;
-    --card: 0 0% 3.9%;
-    --card-foreground: 0 0% 98%;
-    --popover: 0 0% 3.9%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 142.1 70.6% 45.3%;
-    --primary-foreground: 144.9 80.4% 10%;
-    --secondary: 0 0% 14.9%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 0 0% 14.9%;
-    --muted-foreground: 0 0% 63.9%;
-    --accent: 0 0% 14.9%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 14.9%;
-    --input: 0 0% 14.9%;
-    --ring: 142.1 70.6% 45.3%;
-    --chart-1: 220 70% 50%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
+    --background: 228 20% 10%;
+    --foreground: 220 10% 92%;
+    --card: 228 20% 14%;
+    --card-foreground: 220 10% 92%;
+    --popover: 228 20% 14%;
+    --popover-foreground: 220 10% 92%;
+    --primary: 102 78% 44%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 228 15% 20%;
+    --secondary-foreground: 220 10% 88%;
+    --muted: 228 15% 20%;
+    --muted-foreground: 220 10% 55%;
+    --accent: 228 15% 20%;
+    --accent-foreground: 220 10% 92%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 228 15% 22%;
+    --input: 228 15% 22%;
+    --ring: 102 78% 44%;
+    --success: 102 78% 44%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+    --info: 210 100% 52%;
+    --info-foreground: 0 0% 100%;
+    --streak: 25 95% 53%;
+    --xp: 102 78% 44%;
+    --chart-1: 102 78% 44%;
+    --chart-2: 38 92% 50%;
+    --chart-3: 210 100% 52%;
+    --chart-4: 0 72% 51%;
+    --chart-5: 270 60% 55%;
   }
 }
 
@@ -65,5 +85,85 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+/* Duolingo-style 3D button push effect */
+@layer components {
+  .btn-3d {
+    @apply relative font-extrabold tracking-wide uppercase;
+    box-shadow: 0 4px 0 hsl(102 78% 30%);
+    transform: translateY(0);
+    transition: transform 0.1s, box-shadow 0.1s;
+  }
+  .btn-3d:active {
+    transform: translateY(3px);
+    box-shadow: 0 1px 0 hsl(102 78% 30%);
+  }
+  .btn-3d:disabled {
+    box-shadow: 0 4px 0 hsl(var(--muted));
+  }
+
+  .btn-3d-secondary {
+    @apply relative font-extrabold tracking-wide uppercase;
+    box-shadow: 0 4px 0 hsl(var(--border));
+    transform: translateY(0);
+    transition: transform 0.1s, box-shadow 0.1s;
+  }
+  .btn-3d-secondary:active {
+    transform: translateY(3px);
+    box-shadow: 0 1px 0 hsl(var(--border));
+  }
+
+  .btn-3d-destructive {
+    @apply relative font-extrabold tracking-wide uppercase;
+    box-shadow: 0 4px 0 hsl(0 72% 38%);
+    transform: translateY(0);
+    transition: transform 0.1s, box-shadow 0.1s;
+  }
+  .btn-3d-destructive:active {
+    transform: translateY(3px);
+    box-shadow: 0 1px 0 hsl(0 72% 38%);
+  }
+
+  .btn-3d-warning {
+    @apply relative font-extrabold tracking-wide uppercase;
+    box-shadow: 0 4px 0 hsl(38 92% 38%);
+    transform: translateY(0);
+    transition: transform 0.1s, box-shadow 0.1s;
+  }
+  .btn-3d-warning:active {
+    transform: translateY(3px);
+    box-shadow: 0 1px 0 hsl(38 92% 38%);
+  }
+
+  /* Duolingo-style option tile */
+  .option-tile {
+    @apply relative border-2 border-border rounded-2xl bg-card p-4 font-bold transition-all cursor-pointer;
+    box-shadow: 0 3px 0 hsl(var(--border));
+    transform: translateY(0);
+  }
+  .option-tile:active {
+    transform: translateY(2px);
+    box-shadow: 0 1px 0 hsl(var(--border));
+  }
+  .option-tile:hover {
+    @apply border-primary/40;
+  }
+  .option-tile-selected {
+    @apply border-primary bg-primary/5;
+    box-shadow: 0 3px 0 hsl(102 78% 30%);
+  }
+  .option-tile-correct {
+    @apply border-primary bg-primary/10 text-foreground;
+    box-shadow: 0 3px 0 hsl(102 78% 30%);
+  }
+  .option-tile-incorrect {
+    @apply border-destructive bg-destructive/10 text-foreground;
+    box-shadow: 0 3px 0 hsl(0 72% 38%);
+  }
+  .option-tile-disabled {
+    @apply opacity-40 cursor-default;
+    box-shadow: 0 3px 0 hsl(var(--border));
   }
 }

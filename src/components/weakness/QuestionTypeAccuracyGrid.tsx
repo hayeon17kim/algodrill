@@ -29,25 +29,25 @@ interface QuestionTypeAccuracyGridProps {
 
 export function QuestionTypeAccuracyGrid({ typeStats, lang }: QuestionTypeAccuracyGridProps) {
   return (
-    <Card className="mb-6">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
+    <Card>
+      <CardHeader className="pb-3">
+        <CardTitle className="flex items-center gap-2 text-base font-extrabold uppercase tracking-wider text-muted-foreground">
           <Target className="w-5 h-5" />
-          {lang === "ko" ? "문제 유형별 정답률" : "Accuracy by Question Type"}
+          {lang === "ko" ? "문제 유형별 정답률" : "By Question Type"}
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 gap-3">
           {typeStats.map((stat) => (
             <div
               key={stat.type}
-              className={`rounded-lg p-4 border ${getScoreColor(stat.accuracy)}`}
+              className={`rounded-2xl p-4 border-2 ${getScoreColor(stat.accuracy)}`}
             >
-              <div className="text-sm font-medium mb-1">
+              <div className="text-xs font-extrabold mb-1 uppercase tracking-wide">
                 {(TYPE_NAMES[lang] as Record<string, string>)[stat.type] || stat.type}
               </div>
-              <div className="text-3xl font-bold">{stat.accuracy}%</div>
-              <div className="text-xs opacity-75 mt-1">
+              <div className="text-3xl font-black">{stat.accuracy}%</div>
+              <div className="text-xs font-bold opacity-60 mt-1">
                 {stat.correct}/{stat.total} {lang === "ko" ? "정답" : "correct"}
               </div>
             </div>
