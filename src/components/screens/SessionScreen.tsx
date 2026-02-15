@@ -43,37 +43,37 @@ export function SessionScreen({ questions, progress, onComplete, categoryName }:
   const cat = CATEGORIES.find((c) => c.id === q.categoryId);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-indigo-50/30">
+    <div className="min-h-screen bg-background">
       <div className="max-w-md mx-auto px-4 py-6 space-y-6">
         {categoryName && (
-          <div className="animate-in">
-            <Badge variant="secondary" className="text-xs font-semibold bg-indigo-100 text-indigo-700 hover:bg-indigo-100 px-3 py-1.5">
+          <div>
+            <Badge variant="secondary" className="text-xs font-semibold px-3 py-1.5">
               {categoryName}
             </Badge>
           </div>
         )}
-        <div className="flex items-center gap-3 animate-in" style={{ animationDelay: '0.1s' }}>
+        <div className="flex items-center gap-3">
           <span className="text-sm text-muted-foreground font-semibold tabular-nums min-w-[3rem]">
             {idx + 1}/{questions.length}
           </span>
           <div className="flex-1 relative">
-            <Progress value={((idx + 1) / questions.length) * 100} className="h-3 shadow-sm" />
-            <div className="absolute right-0 -top-6 text-xs font-bold text-indigo-600">
+            <Progress value={((idx + 1) / questions.length) * 100} className="h-3" />
+            <div className="absolute right-0 -top-6 text-xs font-bold text-primary">
               {Math.round(((idx + 1) / questions.length) * 100)}%
             </div>
           </div>
         </div>
-        <div className="flex items-center gap-2 animate-in" style={{ animationDelay: '0.2s' }}>
-          <Badge variant="secondary" className="bg-indigo-100 text-indigo-700 hover:bg-indigo-100 px-3 py-1.5 font-semibold">
+        <div className="flex items-center gap-2">
+          <Badge variant="secondary" className="px-3 py-1.5 font-semibold">
             {cat?.icon} {cat ? L(cat.name, lang) : ""}
           </Badge>
-          <Badge variant="outline" className="gap-1 px-2.5 py-1.5 border-amber-300 bg-amber-50">
+          <Badge variant="outline" className="gap-1 px-2.5 py-1.5 border-amber-300 bg-amber-50 dark:bg-amber-950 dark:border-amber-800">
             {Array.from({ length: q.difficulty }).map((_, i) => (
-              <Star key={i} className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+              <Star key={i} className="w-3.5 h-3.5 fill-amber-400 text-amber-400 dark:fill-amber-500 dark:text-amber-500" />
             ))}
           </Badge>
         </div>
-        <div className="animate-in" style={{ animationDelay: '0.3s' }}>
+        <div>
           <QuestionRenderer question={q} onAnswer={handleAnswer} key={q.id + idx} />
         </div>
       </div>

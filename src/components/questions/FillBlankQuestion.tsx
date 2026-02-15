@@ -6,7 +6,8 @@ import { L } from "@/lib/i18n";
 import type { FillBlankQuestion as FBQ } from "@/data/questions";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Code2, CheckCircle, AlertCircle } from "lucide-react";
+import { ResultCard } from "@/components/common/ResultCard";
+import { Code2 } from "lucide-react";
 
 export function FillBlankQuestion({ q, onAnswer }: { q: FBQ; onAnswer: (correct: boolean) => void }) {
   const { lang, t } = useLang();
@@ -44,22 +45,34 @@ export function FillBlankQuestion({ q, onAnswer }: { q: FBQ; onAnswer: (correct:
             </p>
             <div className="flex flex-wrap gap-2">
               {blank.options.map((opt, oi) => {
-                let cls = "px-4 py-2.5 rounded-lg text-sm font-mono font-semibold border-2 transition-all ";
-                if (!revealed) {
-                  cls += answers[bi] === opt
-                    ? "border-indigo-500 bg-indigo-100 text-indigo-700 shadow-sm"
-                    : "border-gray-200 bg-white hover:border-indigo-300 hover:bg-indigo-50 hover-lift";
-                } else if (opt === blank.answer) {
-                  cls += "border-green-500 bg-gradient-to-r from-green-50 to-emerald-50 text-green-800 shadow-md";
-                } else if (opt === answers[bi]) {
-                  cls += "border-red-400 bg-gradient-to-r from-red-50 to-rose-50 text-red-700 shadow-md";
-                } else {
-                  cls += "border-gray-200 bg-gray-50 text-gray-400 opacity-50";
-                }
+                const isSelected = answers[bi] === opt;
+                const isCorrectAnswer = opt === blank.answer;
+                const isWrongSelection = opt === answers[bi] && !isCorrectAnswer;
+
+                const getButtonClass = () => {
+                  const base = "px-4 py-2.5 rounded-lg text-sm font-mono font-semibold border-2 transition-all ";
+
+                  if (!revealed) {
+                    return base + (isSelected
+                      ? "border-indigo-500 bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-200 shadow-sm"
+                      : "border-gray-200 bg-white dark:bg-gray-800 hover:border-indigo-300 hover:bg-indigo-50 dark:hover:bg-indigo-950");
+                  }
+
+                  if (isCorrectAnswer) {
+                    return base + "border-green-500 bg-green-50 dark:bg-green-950 text-green-800 dark:text-green-200 shadow-md";
+                  }
+
+                  if (isWrongSelection) {
+                    return base + "border-red-400 bg-red-50 dark:bg-red-950 text-red-700 dark:text-red-200 shadow-md";
+                  }
+
+                  return base + "border-gray-200 bg-gray-50 dark:bg-gray-900 text-gray-400 dark:text-gray-600 opacity-50";
+                };
+
                 return (
                   <button
                     key={oi}
-                    className={cls}
+                    className={getButtonClass()}
                     onClick={() => handleSelect(bi, opt)}
                     disabled={revealed}
                   >
@@ -75,41 +88,25 @@ export function FillBlankQuestion({ q, onAnswer }: { q: FBQ; onAnswer: (correct:
         <Button
           onClick={() => setRevealed(true)}
           size="lg"
-          className="w-full h-14 rounded-xl font-bold text-lg shadow-lg hover-lift"
-          style={{ background: "linear-gradient(135deg,#6366f1,#8b5cf6)" }}
+          className="w-full h-14 rounded-xl font-bold text-lg shadow-lg "
+          
         >
           {t.checkAnswer}
         </Button>
       )}
       {revealed && (
-        <div className="space-y-4 animate-in">
-          <Card className={`p-5 border-2 ${
-            allCorrect
-              ? "border-green-300 bg-gradient-to-br from-green-50 to-emerald-50"
-              : "border-amber-300 bg-gradient-to-br from-amber-50 to-orange-50"
-          }`}>
-            <div className="flex items-start gap-3">
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
-                allCorrect ? "bg-green-500" : "bg-amber-500"
-              }`}>
-                {allCorrect ? (
-                  <CheckCircle className="w-5 h-5 text-white" />
-                ) : (
-                  <AlertCircle className="w-5 h-5 text-white" />
-                )}
-              </div>
-              <div className="flex-1">
-                <p className="font-bold text-lg mb-2">
-                  {allCorrect ? t.allCorrect : `${results.filter((r) => r).length}/${results.length} ${t.correct}`}
-                </p>
-                <p className="text-sm leading-relaxed text-gray-700">{L(q.explanation, lang)}</p>
-              </div>
-            </div>
-          </Card>
+        <div className="space-y-4 ">
+          <ResultCard
+            variant={allCorrect ? "success" : "error"}
+            icon={allCorrect ? "check" : "alert"}
+            title={allCorrect ? t.allCorrect : `${results.filter((r) => r).length}/${results.length} ${t.correct}`}
+          >
+            <p className="text-gray-700 dark:text-gray-300">{L(q.explanation, lang)}</p>
+          </ResultCard>
           <Button
             size="lg"
-            className="w-full h-14 rounded-xl font-bold text-lg shadow-lg hover-lift transition-all"
-            style={{ background: "linear-gradient(135deg,#6366f1,#8b5cf6)" }}
+            className="w-full h-14 rounded-xl font-bold text-lg shadow-lg  transition-all"
+            
             onClick={() => onAnswer(allCorrect)}
           >
             {t.next}

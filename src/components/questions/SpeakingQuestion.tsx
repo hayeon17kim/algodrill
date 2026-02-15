@@ -6,7 +6,8 @@ import { L } from "@/lib/i18n";
 import type { SpeakingQuestion as SQ } from "@/data/questions";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Mic, CheckCircle, XCircle, Info, MessageSquare } from "lucide-react";
+import { ResultCard } from "@/components/common/ResultCard";
+import { Mic, CheckCircle, XCircle, MessageSquare } from "lucide-react";
 
 export function SpeakingQuestion({ q, onAnswer }: { q: SQ; onAnswer: (correct: boolean) => void }) {
   const { lang, t } = useLang();
@@ -39,67 +40,58 @@ export function SpeakingQuestion({ q, onAnswer }: { q: SQ; onAnswer: (correct: b
           <Button
             onClick={() => setStep("reveal")}
             size="lg"
-            className="w-full h-14 rounded-xl font-bold text-lg shadow-lg hover-lift"
-            style={{ background: "linear-gradient(135deg,#f59e0b,#f97316)" }}
+            className="w-full h-14 rounded-xl font-bold text-lg shadow-lg bg-gradient-orange"
           >
             {t.doneShowAnswer}
           </Button>
         </div>
       )}
       {step === "reveal" && (
-        <div className="space-y-4 animate-in">
-          <Card className="p-5 border-2 border-green-300 bg-gradient-to-br from-green-50 to-emerald-50">
-            <div className="flex items-start gap-3">
-              <div className="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0">
-                <CheckCircle className="w-5 h-5 text-white" />
-              </div>
-              <div className="flex-1">
-                <p className="font-bold text-green-900 mb-2">{t.goodExample}</p>
-                <p className="text-sm text-green-800 italic leading-relaxed">{L(q.goodAnswer, lang)}</p>
-              </div>
-            </div>
-          </Card>
-          <Card className="p-5 border-2 border-red-300 bg-gradient-to-br from-red-50 to-rose-50">
-            <div className="flex items-start gap-3">
-              <div className="w-8 h-8 rounded-full bg-red-500 flex items-center justify-center flex-shrink-0">
-                <XCircle className="w-5 h-5 text-white" />
-              </div>
-              <div className="flex-1">
-                <p className="font-bold text-red-900 mb-3">{t.badExample}</p>
-                <div className="space-y-1.5">
-                  {badAnswers.map((b, i) => (
-                    <div key={i} className="flex items-start gap-2 text-sm text-red-800">
-                      <span className="text-red-500 font-bold">•</span>
-                      <span>{b}</span>
-                    </div>
-                  ))}
+        <div className="space-y-4 ">
+          <ResultCard variant="success" icon="check" title={t.goodExample}>
+            <p className="italic text-green-800 dark:text-green-200">{L(q.goodAnswer, lang)}</p>
+          </ResultCard>
+
+          <ResultCard variant="error" icon="x" title={t.badExample}>
+            <div className="space-y-1.5">
+              {badAnswers.map((b, i) => (
+                <div key={i} className="flex items-start gap-2 text-red-800 dark:text-red-200">
+                  <span className="text-red-500 dark:text-red-400 font-bold">•</span>
+                  <span>{b}</span>
                 </div>
-              </div>
+              ))}
             </div>
-          </Card>
-          <Card className="p-5 border-2 border-blue-200 bg-gradient-to-br from-blue-50 to-indigo-50">
-            <div className="flex items-start gap-3">
-              <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center flex-shrink-0">
-                <Info className="w-5 h-5 text-white" />
-              </div>
-              <div className="flex-1">
-                <p className="text-sm text-blue-900 leading-relaxed">{L(q.explanation, lang)}</p>
-              </div>
-            </div>
-          </Card>
+          </ResultCard>
+
+          <ResultCard variant="info" title="">
+            <p className="text-blue-900 dark:text-blue-100">{L(q.explanation, lang)}</p>
+          </ResultCard>
           <div className="pt-2">
-            <p className="text-center text-sm font-bold text-gray-700 mb-4">{t.howWasI}</p>
+            <p className="text-center text-sm font-bold text-gray-700 dark:text-gray-300 mb-4">{t.howWasI}</p>
             <div className="grid grid-cols-2 gap-3">
               {[
-                { label: t.didBad, score: false, icon: XCircle, activeColor: "border-red-400 bg-gradient-to-br from-red-100 to-rose-100 text-red-800 shadow-md" },
-                { label: t.didGood, score: true, icon: CheckCircle, activeColor: "border-green-400 bg-gradient-to-br from-green-100 to-emerald-100 text-green-800 shadow-md" },
+                {
+                  label: t.didBad,
+                  score: false,
+                  icon: XCircle,
+                  activeClass: "border-red-400 bg-red-100 dark:bg-red-950 text-red-800 dark:text-red-200 shadow-md",
+                  inactiveClass: "border-gray-200 bg-white dark:bg-gray-800 hover:border-gray-300"
+                },
+                {
+                  label: t.didGood,
+                  score: true,
+                  icon: CheckCircle,
+                  activeClass: "border-green-400 bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-200 shadow-md",
+                  inactiveClass: "border-gray-200 bg-white dark:bg-gray-800 hover:border-gray-300"
+                },
               ].map((opt) => {
                 const Icon = opt.icon;
+                const isSelected = selfScore === opt.score;
                 return (
                   <button
                     key={opt.label}
-                    className={`py-4 px-4 rounded-xl font-bold border-2 transition-all hover-lift flex items-center justify-center gap-2 ${
-                      selfScore === opt.score ? opt.activeColor : "border-gray-200 bg-white hover:border-gray-300"
+                    className={`py-4 px-4 rounded-xl font-bold border-2 transition-all flex items-center justify-center gap-2 ${
+                      isSelected ? opt.activeClass : opt.inactiveClass
                     }`}
                     onClick={() => { setSelfScore(opt.score); setTimeout(() => onAnswer(opt.score), 400); }}
                   >

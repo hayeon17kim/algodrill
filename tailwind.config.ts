@@ -5,6 +5,13 @@ const config: Config = {
   content: ["./src/**/*.{js,ts,jsx,tsx,mdx}"],
   theme: {
     extend: {
+      backgroundImage: {
+        'gradient-primary': 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+        'gradient-orange': 'linear-gradient(135deg, #f59e0b, #f97316)',
+        'gradient-success': 'linear-gradient(to bottom right, #dcfce7, #6ee7b7)',
+        'gradient-error': 'linear-gradient(to bottom right, #fef3c7, #fed7aa)',
+        'gradient-info': 'linear-gradient(to bottom right, #dbeafe, #c7d2fe)',
+      },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
