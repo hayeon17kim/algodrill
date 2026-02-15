@@ -5,7 +5,7 @@ export function ProgressBar({ current, total }: { current: number; total: number
   return (
     <div className="w-full bg-secondary rounded-full h-2.5">
       <div
-        className="h-2.5 rounded-full bg-primary transition-all duration-500"
+        className="h-2.5 rounded-full transition-all duration-500"
         style={{ width: `${pct}%` }}
       />
     </div>

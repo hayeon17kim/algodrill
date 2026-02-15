@@ -15,41 +15,46 @@ import type { Lang } from "@/lib/i18n";
  * Custom hook for managing app state (progress, stats, language)
  */
 export function useAppState(userId: string | null) {
-  const [lang, setLang] = useState<Lang>(() => {
-    if (typeof window === "undefined") return "ko";
-    const saved = loadLocal();
-    return saved?.lang || "ko";
-  });
+  // Initialize with default values to avoid hydration mismatch
+  const [lang, setLang] = useState<Lang>("ko");
+  const [progress, setProgress] = useState<Record<string, QuestionProgress>>(getInitialProgress);
+  const [stats, setStats] = useState<Stats>(getInitialStats);
+  const [isInitialized, setIsInitialized] = useState(false);
 
-  const [progress, setProgress] = useState<Record<string, QuestionProgress>>(() => {
-    if (typeof window === "undefined") return getInitialProgress();
-    const saved = loadLocal();
-    return ensureAllQuestions(saved?.progress || getInitialProgress());
-  });
-
-  const [stats, setStats] = useState<Stats>(() => {
-    if (typeof window === "undefined") return getInitialStats();
-    const saved = loadLocal();
-    return saved?.stats || getInitialStats();
-  });
-
-  // Persist to localStorage
+  // Load from localStorage only on client side
   useEffect(() => {
-    saveLocal({ progress, stats, lang });
-  }, [progress, stats, lang]);
+    if (typeof window !== "undefined" && !isInitialized) {
+      const saved = loadLocal();
+      if (saved) {
+        setLang(saved.lang || "ko");
+        setProgress(ensureAllQuestions(saved.progress || getInitialProgress()));
+        setStats(saved.stats || getInitialStats());
+      }
+      setIsInitialized(true);
+    }
+  }, [isInitialized]);
+
+  // Persist to localStorage (only after initialization to avoid overwriting on first render)
+  useEffect(() => {
+    if (isInitialized) {
+      saveLocal({ progress, stats, lang });
+    }
+  }, [progress, stats, lang, isInitialized]);
 
   // Reset daily stats
   useEffect(() => {
-    const today = new Date().toDateString();
-    if (stats.lastDate !== today) {
-      setStats({
-        ...stats,
-        todayCorrect: 0,
-        todayTotal: 0,
-        lastDate: today,
-      });
+    if (isInitialized) {
+      const today = new Date().toDateString();
+      if (stats.lastDate !== today) {
+        setStats({
+          ...stats,
+          todayCorrect: 0,
+          todayTotal: 0,
+          lastDate: today,
+        });
+      }
     }
-  }, []);
+  }, [isInitialized, stats]);
 
   // Background Supabase sync (fire and forget)
   useEffect(() => {

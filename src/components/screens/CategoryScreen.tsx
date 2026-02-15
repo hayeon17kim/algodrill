@@ -39,7 +39,9 @@ export function CategoryScreen({ progress, onSelectCategory, onBack }: Props) {
               <button key={cat.id} onClick={() => onSelectCategory(cat.id)}
                 className="w-full text-left p-4 rounded-xl bg-card border hover:bg-accent transition-colors">
                 <div className="flex items-center gap-3">
-                  <span className="text-2xl">{cat.icon}</span>
+                  <div className="w-10 h-10 flex items-center justify-center flex-shrink-0 text-2xl">
+                    {cat.icon}
+                  </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between">
                       <p className="font-bold truncate">{L(cat.name, lang)}</p>

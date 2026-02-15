@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ResultCard } from "@/components/common/ResultCard";
 import { ListOrdered, CheckCircle, XCircle, Undo2 } from "lucide-react";
+import { stateColors, typeBadgeColors, iconColors } from "@/lib/questionStyles";
 
 export function ApproachQuestion({ q, onAnswer }: { q: AQ; onAnswer: (correct: boolean) => void }) {
   const { lang, t } = useLang();
@@ -41,7 +42,7 @@ export function ApproachQuestion({ q, onAnswer }: { q: AQ; onAnswer: (correct: b
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-2 text-sm font-semibold text-primary bg-secondary px-3 py-2 rounded-lg w-fit">
+      <div className={`flex items-center gap-2 text-sm font-semibold ${typeBadgeColors.approach} px-3 py-2 rounded-lg w-fit`}>
         <ListOrdered className="w-4 h-4" />
         {t.approachOrder}
       </div>
@@ -56,16 +57,16 @@ export function ApproachQuestion({ q, onAnswer }: { q: AQ; onAnswer: (correct: b
               <div key={i} className={`p-4 rounded-lg text-sm flex items-center gap-3 border ${
                 revealed
                   ? stepResults[i]
-                    ? "bg-green-50 dark:bg-green-950 border-green-300 dark:border-green-800"
-                    : "bg-red-50 dark:bg-red-950 border-red-300 dark:border-red-800"
-                  : "bg-secondary border-border"
+                    ? stateColors.correct
+                    : stateColors.incorrect
+                  : stateColors.neutral
               }`}>
                 <span className="font-bold text-base w-7 h-7 flex items-center justify-center bg-card rounded-lg">{i + 1}</span>
                 <span className="flex-1 font-medium">{item.text}</span>
                 {revealed && (
                   stepResults[i] ?
-                    <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400" /> :
-                    <XCircle className="w-5 h-5 text-red-500 dark:text-red-400" />
+                    <CheckCircle className={`w-5 h-5 ${iconColors.correct}`} /> :
+                    <XCircle className={`w-5 h-5 ${iconColors.incorrect}`} />
                 )}
               </div>
             ))}

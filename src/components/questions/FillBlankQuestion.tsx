@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ResultCard } from "@/components/common/ResultCard";
 import { Code2 } from "lucide-react";
+import { typeBadgeColors, getOptionButtonClass } from "@/lib/questionStyles";
 
 export function FillBlankQuestion({ q, onAnswer }: { q: FBQ; onAnswer: (correct: boolean) => void }) {
   const { lang, t } = useLang();
@@ -24,7 +25,7 @@ export function FillBlankQuestion({ q, onAnswer }: { q: FBQ; onAnswer: (correct:
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-2 text-sm font-semibold text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-950 px-3 py-2 rounded-lg w-fit">
+      <div className={`flex items-center gap-2 text-sm font-semibold ${typeBadgeColors.fillblank} px-3 py-2 rounded-lg w-fit`}>
         <Code2 className="w-4 h-4" />
         {t.fillBlank}
       </div>
@@ -47,32 +48,11 @@ export function FillBlankQuestion({ q, onAnswer }: { q: FBQ; onAnswer: (correct:
               {blank.options.map((opt, oi) => {
                 const isSelected = answers[bi] === opt;
                 const isCorrectAnswer = opt === blank.answer;
-                const isWrongSelection = opt === answers[bi] && !isCorrectAnswer;
-
-                const getButtonClass = () => {
-                  const base = "px-4 py-2.5 rounded-lg text-sm font-mono font-semibold border-2 transition-all ";
-
-                  if (!revealed) {
-                    return base + (isSelected
-                      ? "border-primary bg-primary/10 text-primary"
-                      : "border-border bg-card hover:bg-accent");
-                  }
-
-                  if (isCorrectAnswer) {
-                    return base + "border-green-500 bg-green-50 dark:bg-green-950 text-green-800 dark:text-green-200";
-                  }
-
-                  if (isWrongSelection) {
-                    return base + "border-red-400 bg-red-50 dark:bg-red-950 text-red-700 dark:text-red-200";
-                  }
-
-                  return base + "border-border bg-muted text-muted-foreground opacity-50";
-                };
 
                 return (
                   <button
                     key={oi}
-                    className={getButtonClass()}
+                    className={getOptionButtonClass(revealed, isSelected, isCorrectAnswer)}
                     onClick={() => handleSelect(bi, opt)}
                     disabled={revealed}
                   >

@@ -8,6 +8,7 @@ import {
   PERFECT_ACCURACY_THRESHOLD,
   XP_PER_LEVEL,
 } from "./constants";
+import { logStorageError, validateAppState, withRetry, NetworkError } from "./storageErrors";
 
 // ─── Types ──────────────────────────────────────────────────
 export interface QuestionProgress {
@@ -35,60 +36,128 @@ export interface AppState {
 // ─── Local Storage (offline-first cache) ────────────────────
 const STORAGE_KEY = "algodrill_v2";
 
-export function saveLocal(data: AppState) {
+export function saveLocal(data: AppState): boolean {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-  } catch {}
+    const serialized = JSON.stringify(data);
+    localStorage.setItem(STORAGE_KEY, serialized);
+    return true;
+  } catch (error) {
+    logStorageError("saveLocal", error);
+
+    if (error instanceof DOMException && error.name === "QuotaExceededError") {
+      console.warn("LocalStorage quota exceeded. Consider clearing old data.");
+    }
+
+    return false;
+  }
 }
 
 export function loadLocal(): AppState | null {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? JSON.parse(raw) : null;
-  } catch {
+    if (!raw) return null;
+
+    const parsed = JSON.parse(raw);
+
+    if (!validateAppState(parsed)) {
+      logStorageError("loadLocal", new Error("Invalid AppState structure"));
+      localStorage.removeItem(STORAGE_KEY);
+      return null;
+    }
+
+    return parsed;
+  } catch (error) {
+    logStorageError("loadLocal", error);
+
+    try {
+      localStorage.removeItem(STORAGE_KEY);
+    } catch {}
+
     return null;
   }
 }
 
 // ─── Supabase Sync (when configured) ────────────────────────
-export async function syncToServer(userId: string, progress: Record<string, QuestionProgress>) {
-  if (!isSupabaseConfigured() || !supabase) return;
+export async function syncToServer(
+  userId: string,
+  progress: Record<string, QuestionProgress>
+): Promise<{ success: boolean; error?: string }> {
+  if (!isSupabaseConfigured() || !supabase) {
+    return { success: false, error: "Supabase not configured" };
+  }
 
-  const rows = Object.entries(progress).map(([qId, p]) => ({
-    user_id: userId,
-    question_id: qId,
-    streak: p.streak,
-    next_review: new Date(p.nextReview).toISOString(),
-    last_seen: p.lastSeen ? new Date(p.lastSeen).toISOString() : null,
-  }));
+  try {
+    const rows = Object.entries(progress).map(([qId, p]) => ({
+      user_id: userId,
+      question_id: qId,
+      streak: p.streak,
+      next_review: new Date(p.nextReview).toISOString(),
+      last_seen: p.lastSeen ? new Date(p.lastSeen).toISOString() : null,
+    }));
 
-  // Upsert in batches
-  for (let i = 0; i < rows.length; i += SUPABASE_BATCH_SIZE) {
-    await supabase
-      .from("user_progress")
-      .upsert(rows.slice(i, i + SUPABASE_BATCH_SIZE), { onConflict: "user_id,question_id" });
+    // Upsert in batches with error handling
+    for (let i = 0; i < rows.length; i += SUPABASE_BATCH_SIZE) {
+      const batch = rows.slice(i, i + SUPABASE_BATCH_SIZE);
+
+      const { error } = await supabase
+        .from("user_progress")
+        .upsert(batch, { onConflict: "user_id,question_id" });
+
+      if (error) {
+        logStorageError("syncToServer", error);
+        return { success: false, error: error.message };
+      }
+    }
+
+    return { success: true };
+  } catch (error) {
+    logStorageError("syncToServer", error);
+    return { success: false, error: String(error) };
   }
 }
 
 export async function loadFromServer(userId: string): Promise<Record<string, QuestionProgress> | null> {
   if (!isSupabaseConfigured() || !supabase) return null;
 
-  const { data, error } = await supabase
-    .from("user_progress")
-    .select("*")
-    .eq("user_id", userId);
+  try {
+    const { data, error } = await withRetry(
+      async () => {
+        const result = await supabase
+          .from("user_progress")
+          .select("*")
+          .eq("user_id", userId);
 
-  if (error || !data?.length) return null;
+        if (result.error) throw new NetworkError(result.error.message, result.error);
+        return result;
+      },
+      3,
+      1000
+    );
 
-  const progress: Record<string, QuestionProgress> = {};
-  for (const row of data) {
-    progress[row.question_id] = {
-      streak: row.streak,
-      nextReview: new Date(row.next_review).getTime(),
-      lastSeen: row.last_seen ? new Date(row.last_seen).getTime() : 0,
-    };
+    if (error || !data?.length) {
+      if (error) logStorageError("loadFromServer", error);
+      return null;
+    }
+
+    const progress: Record<string, QuestionProgress> = {};
+    for (const row of data) {
+      if (!row.question_id || typeof row.streak !== "number") {
+        logStorageError("loadFromServer", new Error(`Invalid row: ${JSON.stringify(row)}`));
+        continue;
+      }
+
+      progress[row.question_id] = {
+        streak: row.streak,
+        nextReview: new Date(row.next_review).getTime(),
+        lastSeen: row.last_seen ? new Date(row.last_seen).getTime() : 0,
+      };
+    }
+
+    return progress;
+  } catch (error) {
+    logStorageError("loadFromServer", error);
+    return null;
   }
-  return progress;
 }
 
 // ─── Spaced Repetition ──────────────────────────────────────

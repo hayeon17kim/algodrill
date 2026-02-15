@@ -46,8 +46,8 @@ export function SessionScreen({ questions, progress, onComplete, categoryName }:
     <div className="min-h-screen bg-background">
       <div className="max-w-md mx-auto px-4 py-6 space-y-6">
         {categoryName && (
-          <div>
-            <Badge variant="secondary" className="text-xs font-semibold px-3 py-1.5">
+          <div className="animate-in">
+            <Badge variant="secondary" className="text-xs font-semibold  px-3 py-1.5">
               {categoryName}
             </Badge>
           </div>
@@ -57,14 +57,14 @@ export function SessionScreen({ questions, progress, onComplete, categoryName }:
             {idx + 1}/{questions.length}
           </span>
           <div className="flex-1 relative">
-            <Progress value={((idx + 1) / questions.length) * 100} className="h-3" />
+            <Progress value={((idx + 1) / questions.length) * 100} className="h-3 shadow-sm" />
             <div className="absolute right-0 -top-6 text-xs font-bold text-primary">
               {Math.round(((idx + 1) / questions.length) * 100)}%
             </div>
           </div>
         </div>
-        <div className="flex items-center gap-2">
-          <Badge variant="secondary" className="px-3 py-1.5 font-semibold">
+        <div className="flex items-center gap-2 animate-in" style={{ animationDelay: '0.2s' }}>
+          <Badge variant="secondary" className=" px-3 py-1.5 font-semibold">
             {cat?.icon} {cat ? L(cat.name, lang) : ""}
           </Badge>
           <Badge variant="outline" className="gap-1 px-2.5 py-1.5 border-amber-300 bg-amber-50 dark:bg-amber-950 dark:border-amber-800">

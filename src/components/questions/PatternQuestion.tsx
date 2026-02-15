@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ResultCard } from "@/components/common/ResultCard";
 import { Target, CheckCircle, XCircle, Mic } from "lucide-react";
+import { typeBadgeColors, stateColors, iconColors } from "@/lib/questionStyles";
 
 export function PatternQuestion({ q, onAnswer }: { q: PQ; onAnswer: (correct: boolean) => void }) {
   const { lang, t } = useLang();
@@ -21,12 +22,12 @@ export function PatternQuestion({ q, onAnswer }: { q: PQ; onAnswer: (correct: bo
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-2 text-sm font-semibold text-indigo-600 bg-indigo-50 px-3 py-2 rounded-lg w-fit">
+      <div className={`flex items-center gap-2 text-sm font-semibold ${typeBadgeColors.pattern} px-3 py-2 rounded-lg w-fit`}>
         <Target className="w-4 h-4" />
         {t.patternRecog}
       </div>
-      <Card className="p-6 shadow-lg border-2 border-indigo-100">
-        <p className="text-xl font-bold text-gray-900 leading-relaxed">{L(q.question, lang)}</p>
+      <Card className="p-6 shadow-lg border">
+        <p className="text-xl font-bold leading-relaxed">{L(q.question, lang)}</p>
       </Card>
       <div className="space-y-3">
         {q.options.map((opt, i) => {
@@ -36,20 +37,20 @@ export function PatternQuestion({ q, onAnswer }: { q: PQ; onAnswer: (correct: bo
           let cls = "w-full text-left p-5 rounded-xl border-2 transition-all font-semibold text-base ";
 
           if (!revealed) {
-            cls += "border-gray-200 bg-white hover:border-indigo-300 hover:bg-indigo-50 shadow-sm";
+            cls += "border-border bg-card hover:bg-accent shadow-sm";
           } else if (isCorrectAnswer) {
-            cls += "border-green-500 bg-green-50 dark:bg-green-950 text-green-900 dark:text-green-100 shadow-md";
+            cls += `${stateColors.correct} shadow-md`;
           } else if (isUserSelection) {
-            cls += "border-red-400 bg-red-50 dark:bg-red-950 text-red-800 dark:text-red-200 shadow-md";
+            cls += `${stateColors.incorrect} shadow-md`;
           } else {
-            cls += "border-gray-200 bg-gray-50 dark:bg-gray-900 text-gray-400 opacity-60";
+            cls += `${stateColors.disabled}`;
           }
           return (
             <button key={i} className={cls} onClick={() => handleSelect(i)} disabled={revealed}>
               <div className="flex items-center justify-between">
                 <span>{opt}</span>
-                {revealed && i === q.answer && <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />}
-                {revealed && i === selected && i !== q.answer && <XCircle className="w-5 h-5 text-red-500 flex-shrink-0" />}
+                {revealed && i === q.answer && <CheckCircle className={`w-5 h-5 ${iconColors.correct} flex-shrink-0`} />}
+                {revealed && i === selected && i !== q.answer && <XCircle className={`w-5 h-5 ${iconColors.incorrect} flex-shrink-0`} />}
               </div>
             </button>
           );

@@ -17,17 +17,17 @@ interface ResultCardProps {
 export function ResultCard({ variant, icon = "check", title, children, className = "" }: ResultCardProps) {
   const variantStyles = {
     success: {
-      card: "border-green-300 dark:border-green-800 bg-gradient-success dark:bg-green-950",
+      card: "border-green-300 dark:border-green-800 bg-green-50 dark:bg-green-950",
       iconBg: "bg-green-500",
       textColor: "text-green-900 dark:text-green-100",
     },
     error: {
-      card: "border-amber-300 dark:border-amber-800 bg-gradient-error dark:bg-amber-950",
+      card: "border-amber-300 dark:border-amber-800 bg-amber-50 dark:bg-amber-950",
       iconBg: "bg-amber-500",
       textColor: "text-amber-900 dark:text-amber-100",
     },
     info: {
-      card: "border-blue-200 dark:border-blue-800 bg-gradient-info dark:bg-blue-950",
+      card: "border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-950",
       iconBg: "bg-blue-500",
       textColor: "text-blue-900 dark:text-blue-100",
     },
