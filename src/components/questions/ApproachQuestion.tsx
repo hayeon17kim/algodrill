@@ -5,7 +5,8 @@ import { useLang } from "@/components/common/LangContext";
 import { L } from "@/lib/i18n";
 import type { ApproachQuestion as AQ } from "@/data/questions";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import { QuestionLayout } from "./QuestionLayout";
+import { PrimaryActionButton } from "@/components/common/PrimaryActionButton";
 import { ResultCard } from "@/components/common/ResultCard";
 import { ListOrdered, CheckCircle, XCircle, Undo2 } from "lucide-react";
 import { stateColors, typeBadgeColors, iconColors } from "@/lib/questionStyles";
@@ -41,14 +42,12 @@ export function ApproachQuestion({ q, onAnswer }: { q: AQ; onAnswer: (correct: b
   const stepResults = userOrder.map((item, i) => item.correctIdx === i);
 
   return (
-    <div className="space-y-6">
-      <div className={`flex items-center gap-2 text-sm font-semibold ${typeBadgeColors.approach} px-3 py-2 rounded-lg w-fit`}>
-        <ListOrdered className="w-4 h-4" />
-        {t.approachOrder}
-      </div>
-      <Card className="p-6">
-        <p className="text-xl font-bold leading-relaxed">{L(q.question, lang)}</p>
-      </Card>
+    <QuestionLayout
+      badgeIcon={<ListOrdered className="w-4 h-4" />}
+      badgeLabel={t.approachOrder}
+      badgeColorClass={typeBadgeColors.approach}
+      question={q.question}
+    >
       {userOrder.length > 0 && (
         <div className="space-y-3">
           <p className="text-sm font-semibold">{t.myOrder}</p>
@@ -96,9 +95,9 @@ export function ApproachQuestion({ q, onAnswer }: { q: AQ; onAnswer: (correct: b
         </div>
       )}
       {!revealed && remaining.length === 0 && (
-        <Button onClick={() => setRevealed(true)} size="lg" className="w-full h-14 font-bold text-lg">
+        <PrimaryActionButton onClick={() => setRevealed(true)}>
           {t.checkAnswer}
-        </Button>
+        </PrimaryActionButton>
       )}
       {revealed && (
         <div className="space-y-4">
@@ -120,11 +119,11 @@ export function ApproachQuestion({ q, onAnswer }: { q: AQ; onAnswer: (correct: b
               </div>
             )}
           </ResultCard>
-          <Button size="lg" className="w-full h-14 font-bold text-lg" onClick={() => onAnswer(isCorrect)}>
+          <PrimaryActionButton onClick={() => onAnswer(isCorrect)}>
             {t.next}
-          </Button>
+          </PrimaryActionButton>
         </div>
       )}
-    </div>
+    </QuestionLayout>
   );
 }

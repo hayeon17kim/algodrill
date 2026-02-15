@@ -4,8 +4,9 @@ import { useState } from "react";
 import { useLang } from "@/components/common/LangContext";
 import { L } from "@/lib/i18n";
 import type { FillBlankQuestion as FBQ } from "@/data/questions";
-import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { QuestionLayout } from "./QuestionLayout";
+import { PrimaryActionButton } from "@/components/common/PrimaryActionButton";
 import { ResultCard } from "@/components/common/ResultCard";
 import { Code2 } from "lucide-react";
 import { typeBadgeColors, getOptionButtonClass } from "@/lib/questionStyles";
@@ -24,14 +25,12 @@ export function FillBlankQuestion({ q, onAnswer }: { q: FBQ; onAnswer: (correct:
   const allCorrect = results.every((r) => r);
 
   return (
-    <div className="space-y-6">
-      <div className={`flex items-center gap-2 text-sm font-semibold ${typeBadgeColors.fillblank} px-3 py-2 rounded-lg w-fit`}>
-        <Code2 className="w-4 h-4" />
-        {t.fillBlank}
-      </div>
-      <Card className="p-6">
-        <p className="text-xl font-bold leading-relaxed">{L(q.question, lang)}</p>
-      </Card>
+    <QuestionLayout
+      badgeIcon={<Code2 className="w-4 h-4" />}
+      badgeLabel={t.fillBlank}
+      badgeColorClass={typeBadgeColors.fillblank}
+      question={q.question}
+    >
       <Card className="p-0 overflow-hidden border-2 border-gray-700 dark:border-gray-600">
         <pre className="bg-gray-900 dark:bg-gray-950 text-green-400 p-5 text-sm overflow-x-auto leading-relaxed font-mono whitespace-pre-wrap">{q.code}</pre>
       </Card>
@@ -65,13 +64,9 @@ export function FillBlankQuestion({ q, onAnswer }: { q: FBQ; onAnswer: (correct:
         ))}
       </div>
       {!revealed && allFilled && (
-        <Button
-          onClick={() => setRevealed(true)}
-          size="lg"
-          className="w-full h-14 font-bold text-lg"
-        >
+        <PrimaryActionButton onClick={() => setRevealed(true)}>
           {t.checkAnswer}
-        </Button>
+        </PrimaryActionButton>
       )}
       {revealed && (
         <div className="space-y-4">
@@ -82,15 +77,11 @@ export function FillBlankQuestion({ q, onAnswer }: { q: FBQ; onAnswer: (correct:
           >
             <p className="text-gray-700 dark:text-gray-300">{L(q.explanation, lang)}</p>
           </ResultCard>
-          <Button
-            size="lg"
-            className="w-full h-14 font-bold text-lg"
-            onClick={() => onAnswer(allCorrect)}
-          >
+          <PrimaryActionButton onClick={() => onAnswer(allCorrect)}>
             {t.next}
-          </Button>
+          </PrimaryActionButton>
         </div>
       )}
-    </div>
+    </QuestionLayout>
   );
 }

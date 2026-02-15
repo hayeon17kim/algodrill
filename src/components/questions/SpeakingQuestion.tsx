@@ -4,8 +4,9 @@ import { useState } from "react";
 import { useLang } from "@/components/common/LangContext";
 import { L } from "@/lib/i18n";
 import type { SpeakingQuestion as SQ } from "@/data/questions";
-import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { QuestionLayout } from "./QuestionLayout";
+import { PrimaryActionButton } from "@/components/common/PrimaryActionButton";
 import { ResultCard } from "@/components/common/ResultCard";
 import { Mic, CheckCircle, XCircle, MessageSquare } from "lucide-react";
 import { typeBadgeColors, stateColors } from "@/lib/questionStyles";
@@ -17,14 +18,12 @@ export function SpeakingQuestion({ q, onAnswer }: { q: SQ; onAnswer: (correct: b
   const badAnswers = (lang === "ko" ? q.badAnswers.ko : q.badAnswers.en) as string[];
 
   return (
-    <div className="space-y-6">
-      <div className={`flex items-center gap-2 text-sm font-semibold ${typeBadgeColors.speaking} px-3 py-2 rounded-lg w-fit`}>
-        <Mic className="w-4 h-4" />
-        {t.speakingPractice}
-      </div>
-      <Card className="p-6">
-        <p className="text-xl font-bold leading-relaxed">{L(q.question, lang)}</p>
-      </Card>
+    <QuestionLayout
+      badgeIcon={<Mic className="w-4 h-4" />}
+      badgeLabel={t.speakingPractice}
+      badgeColorClass={typeBadgeColors.speaking}
+      question={q.question}
+    >
       {step === "think" && (
         <div className="space-y-4">
           <Card className="p-6 border-orange-200 dark:border-orange-900 bg-orange-50 dark:bg-orange-950">
@@ -38,13 +37,9 @@ export function SpeakingQuestion({ q, onAnswer }: { q: SQ; onAnswer: (correct: b
               </div>
             </div>
           </Card>
-          <Button
-            onClick={() => setStep("reveal")}
-            size="lg"
-            className="w-full h-14 font-bold text-lg"
-          >
+          <PrimaryActionButton onClick={() => setStep("reveal")}>
             {t.doneShowAnswer}
-          </Button>
+          </PrimaryActionButton>
         </div>
       )}
       {step === "reveal" && (
@@ -105,6 +100,6 @@ export function SpeakingQuestion({ q, onAnswer }: { q: SQ; onAnswer: (correct: b
           </div>
         </div>
       )}
-    </div>
+    </QuestionLayout>
   );
 }
