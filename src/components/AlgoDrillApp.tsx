@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useCallback } from "react";
 import { LangContext } from "@/components/common/LangContext";
 import { LangToggle } from "@/components/common/LangToggle";
 import { HomeScreen } from "@/components/screens/HomeScreen";
@@ -8,125 +8,46 @@ import { CategoryScreen } from "@/components/screens/CategoryScreen";
 import { SessionScreen, type SessionResult } from "@/components/screens/SessionScreen";
 import { ResultScreen } from "@/components/screens/ResultScreen";
 import { WeaknessDashboard } from "@/components/screens/WeaknessDashboard";
-import { CATEGORIES } from "@/data/categories";
-import { QUESTIONS, type Question } from "@/data/questions";
-import { L, TEXTS, type Lang } from "@/lib/i18n";
-import {
-  saveLocal,
-  loadLocal,
-  syncToServer,
-  ensureAllQuestions,
-  getInitialProgress,
-  getNextQuestions,
-  type QuestionProgress,
-  type AppState,
-} from "@/lib/storage";
-import { getCurrentUser, onAuthStateChange } from "@/lib/supabase";
+import { TEXTS } from "@/lib/i18n";
+import { useAuth } from "@/hooks/useAuth";
+import { useAppState } from "@/hooks/useAppState";
+import { useSession } from "@/hooks/useSession";
+import type { QuestionProgress } from "@/lib/storage";
 
 type Screen = "home" | "category" | "session" | "result" | "weakness";
 
 export default function AlgoDrillApp() {
-  const [lang, setLang] = useState<Lang>(() => {
-    if (typeof window === "undefined") return "ko";
-    const saved = loadLocal();
-    return saved?.lang || "ko";
-  });
-
   const [screen, setScreen] = useState<Screen>("home");
 
-  const [progress, setProgress] = useState<Record<string, QuestionProgress>>(() => {
-    if (typeof window === "undefined") return getInitialProgress();
-    const saved = loadLocal();
-    return ensureAllQuestions(saved?.progress || getInitialProgress());
-  });
-
-  const [sessionQuestions, setSessionQuestions] = useState<Question[]>([]);
-  const [sessionResults, setSessionResults] = useState<SessionResult[]>([]);
-  const [sessionCategoryName, setSessionCategoryName] = useState<string | null>(null);
-
-  const [stats, setStats] = useState(() => {
-    if (typeof window === "undefined") return { todayCorrect: 0, todayTotal: 0, lastDate: new Date().toDateString() };
-    const saved = loadLocal();
-    return saved?.stats || { todayCorrect: 0, todayTotal: 0, lastDate: new Date().toDateString() };
-  });
-
-  const [user, setUser] = useState<{ id: string; email?: string } | null>(null);
-
-  // Load initial auth state
-  useEffect(() => {
-    getCurrentUser().then((u) => {
-      if (u) setUser({ id: u.id, email: u.email });
-    });
-
-    const unsubscribe = onAuthStateChange((userId) => {
-      if (userId) {
-        getCurrentUser().then((u) => {
-          if (u) setUser({ id: u.id, email: u.email });
-        });
-      } else {
-        setUser(null);
-      }
-    });
-
-    return unsubscribe;
-  }, []);
-
-  // Persist to localStorage
-  useEffect(() => {
-    saveLocal({ progress, stats, lang });
-  }, [progress, stats, lang]);
-
-  // Reset daily stats
-  useEffect(() => {
-    const today = new Date().toDateString();
-    if (stats.lastDate !== today) {
-      setStats({ todayCorrect: 0, todayTotal: 0, lastDate: today });
-    }
-  }, []);
-
-  // Background Supabase sync (fire and forget)
-  useEffect(() => {
-    const userId = user?.id || "anonymous";
-    syncToServer(userId, progress).catch(() => {});
-  }, [progress, user]);
+  // Custom hooks for state management
+  const { user } = useAuth();
+  const { lang, setLang, progress, setProgress, stats, setStats, resetProgress } = useAppState(user?.id || null);
+  const {
+    sessionQuestions,
+    sessionResults,
+    sessionCategoryName,
+    sessionMetadata,
+    startSession: startSessionHook,
+    completeSession: completeSessionHook,
+  } = useSession(progress, setProgress, stats, setStats, lang);
 
   const startSession = useCallback(
     (categoryFilter: string | null = null) => {
-      let qs = getNextQuestions(progress, 5, categoryFilter);
-      if (qs.length === 0 && !categoryFilter) {
-        const fresh = getInitialProgress();
-        setProgress(fresh);
-        qs = getNextQuestions(fresh, 5, null);
+      const started = startSessionHook(categoryFilter);
+      if (started) {
+        setScreen("session");
       }
-      if (qs.length === 0) return false;
-      setSessionQuestions(qs);
-
-      if (categoryFilter) {
-        const cat = CATEGORIES.find((c) => c.id === categoryFilter);
-        setSessionCategoryName(cat ? `${cat.icon} ${L(cat.name, lang)}` : null);
-      } else {
-        setSessionCategoryName(null);
-      }
-
-      setScreen("session");
-      return true;
+      return started;
     },
-    [progress, lang],
+    [startSessionHook]
   );
 
   const completeSession = useCallback(
     (np: Record<string, QuestionProgress>, results: SessionResult[]) => {
-      setProgress(np);
-      setSessionResults(results);
-      const c = results.filter((r) => r.correct).length;
-      setStats((s) => ({
-        todayCorrect: s.todayCorrect + c,
-        todayTotal: s.todayTotal + results.length,
-        lastDate: new Date().toDateString(),
-      }));
+      completeSessionHook(np, results);
       setScreen("result");
     },
-    [],
+    [completeSessionHook]
   );
 
   const handleCategorySelect = useCallback(
@@ -143,8 +64,7 @@ export default function AlgoDrillApp() {
   const handleReset = () => {
     const t = TEXTS[lang];
     if (confirm(t.resetConfirm)) {
-      setProgress(getInitialProgress());
-      setStats({ todayCorrect: 0, todayTotal: 0, lastDate: new Date().toDateString() });
+      resetProgress();
     }
   };
 
@@ -197,7 +117,15 @@ export default function AlgoDrillApp() {
           />
         )}
         {screen === "result" && (
-          <ResultScreen results={sessionResults} onHome={() => setScreen("home")} />
+          <ResultScreen
+            results={sessionResults}
+            earnedXP={sessionMetadata.earnedXP}
+            oldLevel={sessionMetadata.oldLevel}
+            newLevel={sessionMetadata.newLevel}
+            streakUpdated={sessionMetadata.streakUpdated}
+            newStreak={sessionMetadata.newStreak}
+            onHome={() => setScreen("home")}
+          />
         )}
       </div>
     </LangContext.Provider>
