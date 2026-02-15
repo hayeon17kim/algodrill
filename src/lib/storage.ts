@@ -119,10 +119,12 @@ export async function syncToServer(
 export async function loadFromServer(userId: string): Promise<Record<string, QuestionProgress> | null> {
   if (!isSupabaseConfigured() || !supabase) return null;
 
+  const client = supabase;
+
   try {
     const { data, error } = await withRetry(
       async () => {
-        const result = await supabase
+        const result = await client
           .from("user_progress")
           .select("*")
           .eq("user_id", userId);

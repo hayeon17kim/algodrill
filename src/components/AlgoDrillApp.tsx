@@ -2,7 +2,6 @@
 
 import { useState, useCallback } from "react";
 import { LangContext } from "@/components/common/LangContext";
-import { LangToggle } from "@/components/common/LangToggle";
 import { HomeScreen } from "@/components/screens/HomeScreen";
 import { CategoryScreen } from "@/components/screens/CategoryScreen";
 import { SessionScreen, type SessionResult } from "@/components/screens/SessionScreen";
@@ -71,12 +70,8 @@ export default function AlgoDrillApp() {
   const tObj = TEXTS[lang];
 
   return (
-    <LangContext.Provider value={{ lang, t: tObj }}>
+    <LangContext.Provider value={{ lang, t: tObj, setLang }}>
       <div className="select-none">
-        <div className="fixed top-4 right-4 z-50">
-          <LangToggle lang={lang} setLang={setLang} />
-        </div>
-
         {screen === "home" && (
           <HomeScreen
             progress={progress}

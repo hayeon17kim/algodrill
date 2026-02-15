@@ -109,6 +109,23 @@ export const TEXTS: Record<Lang, Record<string, string>> = {
     encouragement1: "매일 조금씩이 큰 차이를 만듭니다!",
     encouragement2: "꾸준함이 실력을 만듭니다!",
     encouragement3: "오늘도 한 발짝 전진했어요!",
+    // Weakness Dashboard
+    weaknessAnalysis: "약점 분석",
+    overallAccuracy: "전체 정답률",
+    questionsAttempted: "문제 시도",
+    weakPatternsTitle: "최근 7일 취약 패턴 Top 3",
+    recentErrors: "최근 오답",
+    accuracy: "정답률",
+    accuracyByCategory: "카테고리별 정답률",
+    accuracyByType: "문제 유형별 정답률",
+    // Question Types
+    typePattern: "패턴 인식",
+    typeApproach: "접근 순서",
+    typeFillblank: "빈칸 채우기",
+    typeSpeaking: "말하기 연습",
+    typeComplexity: "복잡도 분석",
+    // Tips
+    clickWeakCategories: "약한 카테고리를 클릭하면 집중 연습할 수 있습니다",
   },
   en: {
     appName: "AlgoDrill",
@@ -194,5 +211,22 @@ export const TEXTS: Record<Lang, Record<string, string>> = {
     encouragement1: "Small daily progress makes a big difference!",
     encouragement2: "Consistency builds mastery!",
     encouragement3: "One step forward today!",
+    // Weakness Dashboard
+    weaknessAnalysis: "Weakness Analysis",
+    overallAccuracy: "Overall Accuracy",
+    questionsAttempted: "questions attempted",
+    weakPatternsTitle: "Weak Patterns (Last 7 Days)",
+    recentErrors: "Recent errors",
+    accuracy: "accuracy",
+    accuracyByCategory: "Accuracy by Category",
+    accuracyByType: "Accuracy by Question Type",
+    // Question Types
+    typePattern: "Pattern Recognition",
+    typeApproach: "Approach Steps",
+    typeFillblank: "Fill in the Blank",
+    typeSpeaking: "Speaking Practice",
+    typeComplexity: "Complexity Analysis",
+    // Tips
+    clickWeakCategories: "Click on weak categories to practice them",
   },
 };

@@ -6,9 +6,9 @@ export function LangToggle({ lang, setLang }: { lang: Lang; setLang: (l: Lang) =
   return (
     <button
       onClick={() => setLang(lang === "ko" ? "en" : "ko")}
-      className="px-3 py-1.5 rounded-full text-xs font-bold border-2 border-gray-200 bg-white hover:border-primary transition-all"
+      className="px-3 py-1.5 rounded-full text-xs font-bold border-2 border-border bg-card hover:bg-accent transition-colors"
     >
-      {lang === "ko" ? "EN" : "\ud55c"}
+      {lang === "ko" ? "EN" : "한"}
     </button>
   );
 }
