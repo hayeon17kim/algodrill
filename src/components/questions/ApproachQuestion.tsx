@@ -10,7 +10,7 @@ import { ListOrdered, CheckCircle, XCircle, Undo2 } from "lucide-react";
 
 export function ApproachQuestion({ q, onAnswer }: { q: AQ; onAnswer: (correct: boolean) => void }) {
   const { lang, t } = useLang();
-  const steps = L(q.steps, lang) as unknown as string[];
+  const steps = L(q.steps, lang);
   const [shuffled] = useState(() => {
     const a = steps.map((s: string, i: number) => ({ text: s, correctIdx: i }));
     for (let i = a.length - 1; i > 0; i--) {
@@ -48,48 +48,104 @@ export function ApproachQuestion({ q, onAnswer }: { q: AQ; onAnswer: (correct: b
         <p className="text-xl font-bold text-gray-900 leading-relaxed">{L(q.question, lang)}</p>
       </Card>
       {userOrder.length > 0 && (
-        <div className="space-y-1.5">
-          <p className="text-xs font-medium text-gray-500">{t.myOrder}</p>
-          {userOrder.map((item, i) => (
-            <div key={i} className={`p-3 rounded-lg text-sm flex items-center gap-2 ${revealed ? (stepResults[i] ? "bg-green-50 border border-green-200" : "bg-red-50 border border-red-200") : "bg-indigo-50 border border-indigo-200"}`}>
-              <span className="font-bold text-xs w-5 text-center">{i + 1}</span>
-              <span className="flex-1">{item.text}</span>
-              {revealed && (stepResults[i] ? "✅" : "❌")}
-            </div>
-          ))}
-          {!revealed && <button onClick={handleUndo} className="text-sm text-gray-500 underline">{t.undoLast}</button>}
+        <div className="space-y-3">
+          <p className="text-sm font-semibold text-gray-700">{t.myOrder}</p>
+          <div className="space-y-2">
+            {userOrder.map((item, i) => (
+              <div key={i} className={`p-4 rounded-xl text-sm flex items-center gap-3 border-2 transition-all ${
+                revealed
+                  ? stepResults[i]
+                    ? "bg-gradient-to-r from-green-50 to-emerald-50 border-green-300 shadow-sm"
+                    : "bg-gradient-to-r from-red-50 to-rose-50 border-red-300 shadow-sm"
+                  : "bg-indigo-50 border-indigo-200"
+              }`}>
+                <span className="font-black text-base w-7 h-7 flex items-center justify-center bg-white rounded-lg shadow-sm">{i + 1}</span>
+                <span className="flex-1 font-medium">{item.text}</span>
+                {revealed && (
+                  stepResults[i] ?
+                    <CheckCircle className="w-5 h-5 text-green-600" /> :
+                    <XCircle className="w-5 h-5 text-red-500" />
+                )}
+              </div>
+            ))}
+          </div>
+          {!revealed && (
+            <Button
+              onClick={handleUndo}
+              variant="outline"
+              size="sm"
+              className="gap-2 hover-lift"
+            >
+              <Undo2 className="w-4 h-4" />
+              {t.undoLast}
+            </Button>
+          )}
         </div>
       )}
       {!revealed && remaining.length > 0 && (
-        <div className="space-y-1.5">
-          <p className="text-xs font-medium text-gray-500">{t.tapToSelect}</p>
-          {remaining.map((idx: number) => (
-            <button key={idx} onClick={() => handlePick(idx)}
-              className="w-full text-left p-3 rounded-lg text-sm border-2 border-gray-200 bg-white active:bg-indigo-50 transition-all">
-              {shuffled[idx].text}
-            </button>
-          ))}
+        <div className="space-y-3">
+          <p className="text-sm font-semibold text-gray-700">{t.tapToSelect}</p>
+          <div className="space-y-2">
+            {remaining.map((idx: number) => (
+              <button
+                key={idx}
+                onClick={() => handlePick(idx)}
+                className="w-full text-left p-4 rounded-xl text-sm font-medium border-2 border-gray-200 bg-white hover:border-purple-300 hover:bg-purple-50 hover-lift shadow-sm transition-all"
+              >
+                {shuffled[idx].text}
+              </button>
+            ))}
+          </div>
         </div>
       )}
       {!revealed && remaining.length === 0 && (
-        <button onClick={() => setRevealed(true)} className="w-full py-3 rounded-xl font-bold text-white"
-          style={{ background: "linear-gradient(135deg,#6366f1,#8b5cf6)" }}>{t.checkAnswer}</button>
+        <Button
+          onClick={() => setRevealed(true)}
+          size="lg"
+          className="w-full h-14 rounded-xl font-bold text-lg shadow-lg hover-lift"
+          style={{ background: "linear-gradient(135deg,#6366f1,#8b5cf6)" }}
+        >
+          {t.checkAnswer}
+        </Button>
       )}
       {revealed && (
-        <div className="space-y-3 animate-fadeIn">
-          <div className={`p-4 rounded-xl ${isCorrect ? "bg-green-50 border border-green-200" : "bg-amber-50 border border-amber-200"}`}>
-            <p className="font-semibold mb-1">{isCorrect ? `✅ ${t.perfect}` : t.checkOrder}</p>
-            <p className="text-sm text-gray-700">{L(q.explanation, lang)}</p>
-            {!isCorrect && (
-              <div className="mt-3 space-y-1">
-                <p className="text-xs font-semibold text-gray-600">{t.correctOrder}</p>
-                {steps.map((s: string, i: number) => <p key={i} className="text-xs text-gray-600">{i + 1}. {s}</p>)}
+        <div className="space-y-4 animate-in">
+          <Card className={`p-5 border-2 ${
+            isCorrect
+              ? "border-green-300 bg-gradient-to-br from-green-50 to-emerald-50"
+              : "border-amber-300 bg-gradient-to-br from-amber-50 to-orange-50"
+          }`}>
+            <div className="flex items-start gap-3">
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
+                isCorrect ? "bg-green-500" : "bg-amber-500"
+              }`}>
+                <CheckCircle className="w-5 h-5 text-white" />
               </div>
-            )}
-          </div>
-          <button className="w-full py-3 rounded-xl font-bold text-white"
+              <div className="flex-1">
+                <p className="font-bold text-lg mb-2">{isCorrect ? t.perfect : t.checkOrder}</p>
+                <p className="text-sm leading-relaxed text-gray-700">{L(q.explanation, lang)}</p>
+                {!isCorrect && (
+                  <div className="mt-4 p-3 bg-white/60 rounded-lg space-y-2">
+                    <p className="text-xs font-bold text-gray-700 uppercase tracking-wider">{t.correctOrder}</p>
+                    {steps.map((s: string, i: number) => (
+                      <div key={i} className="flex items-start gap-2 text-sm text-gray-700">
+                        <span className="font-bold text-indigo-600 min-w-[1.5rem]">{i + 1}.</span>
+                        <span>{s}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </Card>
+          <Button
+            size="lg"
+            className="w-full h-14 rounded-xl font-bold text-lg shadow-lg hover-lift transition-all"
             style={{ background: "linear-gradient(135deg,#6366f1,#8b5cf6)" }}
-            onClick={() => onAnswer(isCorrect)}>{t.next}</button>
+            onClick={() => onAnswer(isCorrect)}
+          >
+            {t.next}
+          </Button>
         </div>
       )}
     </div>
