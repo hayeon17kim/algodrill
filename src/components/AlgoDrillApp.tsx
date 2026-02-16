@@ -20,7 +20,7 @@ export default function AlgoDrillApp() {
 
   // Custom hooks for state management
   const { user } = useAuth();
-  const { lang, setLang, progress, setProgress, stats, setStats, resetProgress } = useAppState(user?.id || null);
+  const { lang, setLang, progress, setProgress, stats, setStats, dailyGoal, setDailyGoal, resetProgress } = useAppState(user?.id || null);
   const {
     sessionQuestions,
     sessionResults,
@@ -77,6 +77,8 @@ export default function AlgoDrillApp() {
             progress={progress}
             stats={stats}
             user={user}
+            dailyGoal={dailyGoal}
+            setDailyGoal={setDailyGoal}
             onStart={() => startSession(null)}
             onCategoryMode={() => setScreen("category")}
             onWeakness={() => setScreen("weakness")}

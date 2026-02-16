@@ -31,6 +31,7 @@ export interface AppState {
   progress: Record<string, QuestionProgress>;
   stats: Stats;
   lang: "ko" | "en";
+  dailyGoal: number;
 }
 
 // ─── Local Storage (offline-first cache) ────────────────────

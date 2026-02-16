@@ -11,8 +11,8 @@
     --card-foreground: 220 20% 20%;
     --popover: 0 0% 100%;
     --popover-foreground: 220 20% 20%;
-    /* Signature Duolingo green */
-    --primary: 102 78% 40%;
+    /* Primary indigo color */
+    --primary: 238 84% 67%;
     --primary-foreground: 0 0% 100%;
     --secondary: 220 10% 94%;
     --secondary-foreground: 220 20% 25%;
@@ -25,7 +25,7 @@
     --destructive-foreground: 0 0% 100%;
     --border: 220 13% 88%;
     --input: 220 13% 88%;
-    --ring: 102 78% 40%;
+    --ring: 238 84% 67%;
     --radius: 1rem;
     /* Gamification accent colors */
     --success: 102 78% 40%;
@@ -35,8 +35,8 @@
     --info: 210 100% 52%;
     --info-foreground: 0 0% 100%;
     --streak: 25 95% 53%;
-    --xp: 102 78% 40%;
-    --chart-1: 102 78% 40%;
+    --xp: 238 84% 67%;
+    --chart-1: 238 84% 67%;
     --chart-2: 38 92% 50%;
     --chart-3: 210 100% 52%;
     --chart-4: 0 72% 51%;
@@ -50,7 +50,7 @@
     --card-foreground: 220 10% 92%;
     --popover: 228 20% 14%;
     --popover-foreground: 220 10% 92%;
-    --primary: 102 78% 44%;
+    --primary: 238 84% 67%;
     --primary-foreground: 0 0% 100%;
     --secondary: 228 15% 20%;
     --secondary-foreground: 220 10% 88%;
@@ -62,7 +62,7 @@
     --destructive-foreground: 0 0% 100%;
     --border: 228 15% 22%;
     --input: 228 15% 22%;
-    --ring: 102 78% 44%;
+    --ring: 238 84% 67%;
     --success: 102 78% 44%;
     --success-foreground: 0 0% 100%;
     --warning: 38 92% 50%;
@@ -70,8 +70,8 @@
     --info: 210 100% 52%;
     --info-foreground: 0 0% 100%;
     --streak: 25 95% 53%;
-    --xp: 102 78% 44%;
-    --chart-1: 102 78% 44%;
+    --xp: 238 84% 67%;
+    --chart-1: 238 84% 67%;
     --chart-2: 38 92% 50%;
     --chart-3: 210 100% 52%;
     --chart-4: 0 72% 51%;
@@ -92,13 +92,13 @@
 @layer components {
   .btn-3d {
     @apply relative font-extrabold tracking-wide uppercase;
-    box-shadow: 0 4px 0 hsl(102 78% 30%);
+    box-shadow: 0 4px 0 hsl(238 84% 50%);
     transform: translateY(0);
     transition: transform 0.1s, box-shadow 0.1s;
   }
   .btn-3d:active {
     transform: translateY(3px);
-    box-shadow: 0 1px 0 hsl(102 78% 30%);
+    box-shadow: 0 1px 0 hsl(238 84% 50%);
   }
   .btn-3d:disabled {
     box-shadow: 0 4px 0 hsl(var(--muted));
@@ -152,11 +152,11 @@
   }
   .option-tile-selected {
     @apply border-primary bg-primary/5;
-    box-shadow: 0 3px 0 hsl(102 78% 30%);
+    box-shadow: 0 3px 0 hsl(238 84% 50%);
   }
   .option-tile-correct {
     @apply border-primary bg-primary/10 text-foreground;
-    box-shadow: 0 3px 0 hsl(102 78% 30%);
+    box-shadow: 0 3px 0 hsl(238 84% 50%);
   }
   .option-tile-incorrect {
     @apply border-destructive bg-destructive/10 text-foreground;

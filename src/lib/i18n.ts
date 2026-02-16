@@ -32,8 +32,8 @@ export const TEXTS: Record<Lang, Record<string, string>> = {
     problems: "문제",
     reviewDue: "복습할 문제가 있어요",
     correct: "정답",
-    startSession: "학습 시작 →",
-    reviewAll: "전체 복습 →",
+    startSession: "오늘의 문제 풀기",
+    reviewAll: "전체 복습하기",
     progress: "학습 진도",
     totalMaster: "전체 마스터",
     tipTitle: "오늘의 팁",
@@ -126,6 +126,20 @@ export const TEXTS: Record<Lang, Record<string, string>> = {
     typeComplexity: "복잡도 분석",
     // Tips
     clickWeakCategories: "약한 카테고리를 클릭하면 집중 연습할 수 있습니다",
+    // Welcome (empty state)
+    welcomeTitle: "첫 문제를 풀어보세요!",
+    welcomeSubtitle: "매일 5분, 라이브 코딩 면접을 준비하는 가장 쉬운 방법이에요.",
+    welcomeCTA: "첫 학습 시작하기",
+    // Sub CTA descriptions
+    categoryModeDesc: "원하는 주제를 골라서 학습해요",
+    weaknessDesc: "자주 틀리는 유형을 집중 연습해요",
+    // Result screen
+    continueLearning: "계속 학습하기",
+    backToHome: "홈으로",
+    perfectCelebration: "모든 문제를 마스터했어요!",
+    streakDay: "일째 연속 학습 중",
+    resultSummaryCorrect: "개 정답",
+    resultSummaryWrong: "개 오답",
   },
   en: {
     appName: "AlgoDrill",
@@ -134,8 +148,8 @@ export const TEXTS: Record<Lang, Record<string, string>> = {
     problems: "problems",
     reviewDue: "You have problems to review",
     correct: "correct",
-    startSession: "Start Session →",
-    reviewAll: "Review All →",
+    startSession: "Solve Today's Problems",
+    reviewAll: "Review All Problems",
     progress: "Progress",
     totalMaster: "Total Mastered",
     tipTitle: "Tip of the Day",
@@ -228,5 +242,19 @@ export const TEXTS: Record<Lang, Record<string, string>> = {
     typeComplexity: "Complexity Analysis",
     // Tips
     clickWeakCategories: "Click on weak categories to practice them",
+    // Welcome (empty state)
+    welcomeTitle: "Solve your first problem!",
+    welcomeSubtitle: "The easiest way to prep for live coding interviews, 5 min a day.",
+    welcomeCTA: "Start First Lesson",
+    // Sub CTA descriptions
+    categoryModeDesc: "Pick a topic and focus on it",
+    weaknessDesc: "Practice your most-missed patterns",
+    // Result screen
+    continueLearning: "Continue Learning",
+    backToHome: "Home",
+    perfectCelebration: "You've mastered every question!",
+    streakDay: "-day streak",
+    resultSummaryCorrect: " correct",
+    resultSummaryWrong: " wrong",
   },
 };

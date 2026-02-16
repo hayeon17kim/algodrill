@@ -17,7 +17,7 @@ export function ProgressSection({ mastered, totalQ, categoryStats }: ProgressSec
   return (
     <Card>
       <CardHeader className="pb-3">
-        <CardTitle className="text-base font-extrabold flex items-center gap-2 uppercase tracking-wider text-muted-foreground">
+        <CardTitle className="text-sm font-bold flex items-center gap-2 text-muted-foreground">
           {t.progress}
         </CardTitle>
       </CardHeader>
@@ -25,12 +25,12 @@ export function ProgressSection({ mastered, totalQ, categoryStats }: ProgressSec
         <div className="space-y-3 p-4 bg-secondary/50 rounded-2xl">
           <div className="flex justify-between items-center">
             <span className="text-sm font-bold">{t.totalMaster}</span>
-            <span className="text-lg font-black text-primary">
+            <span className="text-lg font-black text-foreground">
               {mastered}/{totalQ}
             </span>
           </div>
-          <Progress value={pct} className="h-4" />
-          <div className="text-right text-xs font-extrabold text-primary">
+          <Progress value={pct} className="h-3" />
+          <div className="text-right text-xs font-extrabold text-muted-foreground">
             {pct}%
           </div>
         </div>
@@ -44,7 +44,7 @@ export function ProgressSection({ mastered, totalQ, categoryStats }: ProgressSec
                   {cat}
                 </span>
                 <div className="flex items-center gap-3 flex-shrink-0">
-                  <Progress value={catPct} className="w-24 h-3" />
+                  <Progress value={catPct} className="w-24 h-2" />
                   <span className="text-xs font-extrabold text-muted-foreground w-10 text-right tabular-nums">
                     {d.mastered}/{d.total}
                   </span>

@@ -19,6 +19,7 @@ export function useAppState(userId: string | null) {
   const [lang, setLang] = useState<Lang>("ko");
   const [progress, setProgress] = useState<Record<string, QuestionProgress>>(getInitialProgress);
   const [stats, setStats] = useState<Stats>(getInitialStats);
+  const [dailyGoal, setDailyGoal] = useState<number>(10);
   const [isInitialized, setIsInitialized] = useState(false);
 
   // Load from localStorage only on client side
@@ -29,6 +30,7 @@ export function useAppState(userId: string | null) {
         setLang(saved.lang || "ko");
         setProgress(ensureAllQuestions(saved.progress || getInitialProgress()));
         setStats(saved.stats || getInitialStats());
+        setDailyGoal(saved.dailyGoal || 10);
       }
       setIsInitialized(true);
     }
@@ -37,9 +39,9 @@ export function useAppState(userId: string | null) {
   // Persist to localStorage (only after initialization to avoid overwriting on first render)
   useEffect(() => {
     if (isInitialized) {
-      saveLocal({ progress, stats, lang });
+      saveLocal({ progress, stats, lang, dailyGoal });
     }
-  }, [progress, stats, lang, isInitialized]);
+  }, [progress, stats, lang, dailyGoal, isInitialized]);
 
   // Reset daily stats
   useEffect(() => {
@@ -76,6 +78,8 @@ export function useAppState(userId: string | null) {
     setProgress,
     stats,
     setStats,
+    dailyGoal,
+    setDailyGoal,
     resetProgress,
   };
 }

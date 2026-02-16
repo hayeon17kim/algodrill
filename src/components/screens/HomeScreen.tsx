@@ -19,21 +19,28 @@ import { StatsCard } from "@/components/home/StatsCard";
 import { LevelStreakCards } from "@/components/home/LevelStreakCards";
 import { ProgressSection } from "@/components/home/ProgressSection";
 import { TipCard } from "@/components/home/TipCard";
+import { WelcomeCard } from "@/components/home/WelcomeCard";
 
 interface Props {
   progress: Record<string, QuestionProgress>;
   stats: Stats;
   user: { id: string; email?: string } | null;
+  dailyGoal: number;
+  setDailyGoal: (goal: number) => void;
   onStart: () => void;
   onCategoryMode: () => void;
   onWeakness: () => void;
   onReset: () => void;
 }
 
-export function HomeScreen({ progress, stats, user, onStart, onCategoryMode, onWeakness, onReset }: Props) {
+export function HomeScreen({ progress, stats, user, dailyGoal, setDailyGoal, onStart, onCategoryMode, onWeakness, onReset }: Props) {
   const { lang, t, setLang } = useLang();
   const totalQ = QUESTIONS.length;
   const { mastered, due: dueCount } = getOverallProgressStats(progress);
+
+  // Determine if user is brand new (no activity at all)
+  const isNewUser = stats.todayTotal === 0 && mastered === 0 && stats.totalXP === 0;
+  const hasLevelOrStreak = stats.totalXP > 0 || stats.currentStreak > 0;
 
   const catStats: Record<string, { total: number; mastered: number }> = {};
   CATEGORIES.forEach((cat) => {
@@ -46,43 +53,71 @@ export function HomeScreen({ progress, stats, user, onStart, onCategoryMode, onW
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Top Bar */}
+      {/* Header — simplified */}
       <header className="sticky top-0 z-10 bg-card border-b-2 border-border">
         <div className="max-w-lg mx-auto px-4 h-14 flex items-center justify-between">
           <h1 className="text-2xl font-black text-primary tracking-tight font-sans">
             {t.appName}
           </h1>
-          <div className="flex items-center gap-2">
-            <LoginButton user={user} />
+          <div className="flex items-center gap-1">
             <LangToggle lang={lang} setLang={setLang} />
             <ThemeToggle />
+            <LoginButton user={user} />
           </div>
         </div>
       </header>
 
-      <main className="max-w-lg mx-auto px-4 py-6 space-y-5">
-        <StatsCard dueCount={dueCount} todayCorrect={stats.todayCorrect} todayTotal={stats.todayTotal} />
+      <main className="max-w-lg mx-auto px-4 pt-8 pb-6 space-y-8">
+        {isNewUser ? (
+          /* ── New user: Welcome card with single CTA ── */
+          <WelcomeCard onStart={onStart} />
+        ) : (
+          /* ── Returning user: Full dashboard ── */
+          <>
+            {/* Hero area: Today's stats */}
+            <StatsCard
+              dailyGoal={dailyGoal}
+              todayCorrect={stats.todayCorrect}
+              todayTotal={stats.todayTotal}
+              setDailyGoal={setDailyGoal}
+            />
 
-        <LevelStreakCards stats={stats} />
+            {/* Level & Streak — only if user has activity */}
+            {hasLevelOrStreak && (
+              <LevelStreakCards stats={stats} />
+            )}
 
-        {/* Main CTA */}
-        <div className="space-y-3">
-          <Button onClick={onStart} size="lg" className="w-full h-16 text-lg">
-            {dueCount > 0 ? t.startSession : t.reviewAll}
-          </Button>
-          <div className="grid grid-cols-2 gap-3">
-            <Button onClick={onCategoryMode} variant="outline" size="lg" className="h-14">
-              <FolderOpen className="w-5 h-5 mr-2" />
-              {t.categoryMode}
-            </Button>
-            <Button onClick={onWeakness} variant="outline" size="lg" className="h-14">
-              <TrendingDown className="w-5 h-5 mr-2" />
-              {lang === "ko" ? "약점 분석" : "Weakness"}
-            </Button>
-          </div>
-        </div>
+            {/* CTA buttons with clear hierarchy */}
+            <div className="space-y-3">
+              <Button onClick={onStart} size="lg" className="w-full h-16 text-lg btn-3d">
+                {dueCount > 0 ? t.startSession : t.reviewAll}
+              </Button>
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  onClick={onCategoryMode}
+                  className="flex flex-col items-center gap-1.5 p-4 rounded-2xl border-2 border-border bg-card text-foreground hover:bg-accent transition-colors"
+                >
+                  <FolderOpen className="w-5 h-5 text-muted-foreground" />
+                  <span className="text-sm font-bold">{t.categoryMode}</span>
+                  <span className="text-xs text-muted-foreground">{t.categoryModeDesc}</span>
+                </button>
+                <button
+                  onClick={onWeakness}
+                  className="flex flex-col items-center gap-1.5 p-4 rounded-2xl border-2 border-border bg-card text-foreground hover:bg-accent transition-colors"
+                >
+                  <TrendingDown className="w-5 h-5 text-muted-foreground" />
+                  <span className="text-sm font-bold">{lang === "ko" ? "약점 분석" : "Weakness"}</span>
+                  <span className="text-xs text-muted-foreground">{t.weaknessDesc}</span>
+                </button>
+              </div>
+            </div>
+          </>
+        )}
 
-        <ProgressSection mastered={mastered} totalQ={totalQ} categoryStats={catStats} />
+        {/* Progress — only show if user has started learning */}
+        {!isNewUser && (
+          <ProgressSection mastered={mastered} totalQ={totalQ} categoryStats={catStats} />
+        )}
 
         <TipCard />
 
