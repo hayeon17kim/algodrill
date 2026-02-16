@@ -133,6 +133,17 @@ export const TEXTS: Record<Lang, Record<string, string>> = {
     // Sub CTA descriptions
     categoryModeDesc: "원하는 주제를 골라서 학습해요",
     weaknessDesc: "자주 틀리는 유형을 집중 연습해요",
+    // State-based CTA & feedback
+    completedToday: "오늘 학습 완료!",
+    reviewMistakes: "틀린 문제 복습하기",
+    studyAhead: "내일 미리 풀기",
+    continueSession: "이어서 풀기",
+    remainingCount: "문제 남음",
+    feedbackPerfect: "완벽해요!",
+    feedbackGreat: "잘했어요!",
+    feedbackGood: "좋은 시작이에요!",
+    feedbackKeepGoing: "조금만 더 연습해요!",
+    accuracyLabel: "정답률",
     // Result screen
     continueLearning: "계속 학습하기",
     backToHome: "홈으로",
@@ -249,6 +260,17 @@ export const TEXTS: Record<Lang, Record<string, string>> = {
     // Sub CTA descriptions
     categoryModeDesc: "Pick a topic and focus on it",
     weaknessDesc: "Practice your most-missed patterns",
+    // State-based CTA & feedback
+    completedToday: "Today's Study Complete!",
+    reviewMistakes: "Review Mistakes",
+    studyAhead: "Study Ahead",
+    continueSession: "Continue",
+    remainingCount: "left",
+    feedbackPerfect: "Perfect!",
+    feedbackGreat: "Great job!",
+    feedbackGood: "Good start!",
+    feedbackKeepGoing: "Keep practicing!",
+    accuracyLabel: "accuracy",
     // Result screen
     continueLearning: "Continue Learning",
     backToHome: "Home",
