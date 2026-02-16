@@ -76,7 +76,7 @@ export function FillBlankQuestion({ q, onAnswer }: { q: FBQ; onAnswer: (correct:
           >
             <p className="text-muted-foreground">{L(q.explanation, lang)}</p>
           </ResultCard>
-          <PrimaryActionButton onClick={() => onAnswer(allCorrect)}>
+          <PrimaryActionButton onClick={() => onAnswer(allCorrect)} delayMs={2000}>
             {t.next}
           </PrimaryActionButton>
         </div>

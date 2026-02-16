@@ -119,7 +119,7 @@ export function ApproachQuestion({ q, onAnswer }: { q: AQ; onAnswer: (correct: b
               </div>
             )}
           </ResultCard>
-          <PrimaryActionButton onClick={() => onAnswer(isCorrect)}>
+          <PrimaryActionButton onClick={() => onAnswer(isCorrect)} delayMs={2000}>
             {t.next}
           </PrimaryActionButton>
         </div>
