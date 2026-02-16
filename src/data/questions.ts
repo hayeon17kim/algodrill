@@ -11,6 +11,8 @@ export interface PatternQuestion {
   answer: number;
   explanation: Bilingual;
   speakingTip?: Bilingual;
+  /** Optional per-option reasons explaining why each option is correct/incorrect */
+  optionReasons?: Bilingual[];
 }
 
 export interface ApproachQuestion {
