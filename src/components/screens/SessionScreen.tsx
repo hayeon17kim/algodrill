@@ -9,7 +9,7 @@ import { updateProgress, type QuestionProgress } from "@/lib/storage";
 import type { Question } from "@/data/questions";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
-import { Star, X, Heart } from "lucide-react";
+import { Star, X, CheckCircle2 } from "lucide-react";
 
 export interface SessionResult {
   questionId: string;
@@ -57,40 +57,42 @@ export function SessionScreen({ questions, progress, onComplete, onCancel, categ
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Duolingo-style top bar with progress */}
+      {/* Sticky top bar with progress + category */}
       <div className="sticky top-0 z-10 bg-card border-b-2 border-border">
-        <div className="max-w-lg mx-auto px-4 py-3">
+        <div className="max-w-lg mx-auto px-4 py-3 space-y-2">
           <div className="flex items-center gap-3">
             {onCancel && (
               <button onClick={handleCancel} className="text-muted-foreground hover:text-foreground transition-colors">
                 <X className="w-6 h-6" strokeWidth={3} />
               </button>
             )}
-            <div className="flex-1">
+            <div className="flex-1 flex items-center gap-2">
               <Progress value={((idx + 1) / questions.length) * 100} className="h-4" />
+              <span className="text-xs font-black text-muted-foreground whitespace-nowrap">
+                {idx + 1}/{questions.length}
+              </span>
             </div>
-            <div className="flex items-center gap-1 text-destructive font-extrabold text-sm">
-              <Heart className="w-5 h-5 fill-destructive" />
-              <span>{questions.length - (results.length - correctCount)}</span>
+            <div className="flex items-center gap-1 text-primary font-extrabold text-sm">
+              <CheckCircle2 className="w-5 h-5" />
+              <span>{correctCount}/{results.length}</span>
+            </div>
+          </div>
+          {/* Category + difficulty — always visible in sticky header */}
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5 text-xs font-extrabold text-muted-foreground bg-secondary px-2.5 py-1 rounded-lg">
+              <span>{cat?.icon}</span>
+              <span>{cat ? L(cat.name, lang) : ""}</span>
+            </div>
+            <div className="flex items-center gap-0.5 bg-warning/10 px-2 py-1 rounded-lg">
+              {Array.from({ length: q.difficulty }).map((_, i) => (
+                <Star key={i} className="w-3 h-3 fill-warning text-warning" />
+              ))}
             </div>
           </div>
         </div>
       </div>
 
       <div className="max-w-lg mx-auto px-4 py-6 space-y-5">
-        {/* Category and difficulty pills */}
-        <div className="flex items-center gap-2 animate-slide-up">
-          <div className="flex items-center gap-1.5 text-sm font-extrabold text-muted-foreground bg-secondary px-3 py-1.5 rounded-xl">
-            <span>{cat?.icon}</span>
-            <span>{cat ? L(cat.name, lang) : ""}</span>
-          </div>
-          <div className="flex items-center gap-0.5 bg-warning/10 px-2.5 py-1.5 rounded-xl">
-            {Array.from({ length: q.difficulty }).map((_, i) => (
-              <Star key={i} className="w-3.5 h-3.5 fill-warning text-warning" />
-            ))}
-          </div>
-        </div>
-
         {/* Question content */}
         <div className="animate-slide-up">
           <QuestionRenderer question={q} onAnswer={handleAnswer} key={q.id + idx} />
