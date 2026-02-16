@@ -155,11 +155,11 @@
     box-shadow: 0 3px 0 hsl(238 84% 50%);
   }
   .option-tile-correct {
-    @apply border-primary bg-primary/10 text-foreground;
-    box-shadow: 0 3px 0 hsl(238 84% 50%);
+    @apply border-green-500 bg-green-500/15 text-foreground;
+    box-shadow: 0 3px 0 hsl(142 71% 35%);
   }
   .option-tile-incorrect {
-    @apply border-destructive bg-destructive/10 text-foreground;
+    @apply border-red-500 bg-red-500/15 text-foreground;
     box-shadow: 0 3px 0 hsl(0 72% 38%);
   }
   .option-tile-disabled {

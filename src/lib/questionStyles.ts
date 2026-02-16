@@ -57,6 +57,6 @@ export const getOptionButtonClass = (
 
 // Icon colors
 export const iconColors = {
-  correct: "text-primary",
+  correct: "text-green-600",
   incorrect: "text-destructive",
 } as const;
