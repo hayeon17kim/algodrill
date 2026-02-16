@@ -12,7 +12,7 @@ import {
   type Stats,
 } from "@/lib/storage";
 import { Button } from "@/components/ui/button";
-import { FolderOpen, TrendingDown } from "lucide-react";
+import { FolderOpen, TrendingDown, Sparkles } from "lucide-react";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { LangToggle } from "@/components/common/LangToggle";
 import { StatsCard } from "@/components/home/StatsCard";
@@ -84,25 +84,58 @@ export function HomeScreen({ progress, stats, user, dailyGoal, setDailyGoal, onS
               onStart={onStart}
             />
 
-            {/* Sub CTAs — right after primary CTA */}
-            <div className="grid grid-cols-2 gap-3">
-              <button
-                onClick={onCategoryMode}
-                className="flex flex-col items-center gap-1.5 p-4 rounded-2xl border-2 border-border bg-card text-foreground hover:bg-accent transition-colors"
-              >
-                <FolderOpen className="w-5 h-5 text-muted-foreground" />
-                <span className="text-sm font-bold">{t.categoryMode}</span>
-                <span className="text-xs text-muted-foreground">{t.categoryModeDesc}</span>
-              </button>
-              <button
-                onClick={onWeakness}
-                className="flex flex-col items-center gap-1.5 p-4 rounded-2xl border-2 border-border bg-card text-foreground hover:bg-accent transition-colors"
-              >
-                <TrendingDown className="w-5 h-5 text-muted-foreground" />
-                <span className="text-sm font-bold">{lang === "ko" ? "약점 분석" : "Weakness"}</span>
-                <span className="text-xs text-muted-foreground">{t.weaknessDesc}</span>
-              </button>
-            </div>
+            {/* Sub CTAs — highlight based on learning state */}
+            {(() => {
+              const wrongCount = stats.todayTotal - stats.todayCorrect;
+              const isCompleted = stats.todayTotal >= dailyGoal;
+              const isPerfect = isCompleted && wrongCount === 0;
+              const hasMistakes = isCompleted && wrongCount > 0;
+
+              // Highlight weakness card when user has mistakes, category when perfect
+              const weaknessHighlight = hasMistakes;
+              const categoryHighlight = isPerfect;
+
+              return (
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    onClick={onCategoryMode}
+                    className={`flex flex-col items-center gap-1.5 p-4 rounded-2xl border-2 bg-card text-foreground hover:bg-accent transition-all ${
+                      categoryHighlight
+                        ? "border-primary/40 bg-primary/5 ring-1 ring-primary/20"
+                        : "border-border"
+                    }`}
+                  >
+                    {categoryHighlight ? (
+                      <Sparkles className="w-5 h-5 text-primary" />
+                    ) : (
+                      <FolderOpen className="w-5 h-5 text-muted-foreground" />
+                    )}
+                    <span className="text-sm font-bold">{t.categoryMode}</span>
+                    <span className="text-xs text-muted-foreground">
+                      {categoryHighlight
+                        ? (lang === "ko" ? "새로운 주제 도전!" : "Try a new topic!")
+                        : t.categoryModeDesc}
+                    </span>
+                  </button>
+                  <button
+                    onClick={onWeakness}
+                    className={`flex flex-col items-center gap-1.5 p-4 rounded-2xl border-2 bg-card text-foreground hover:bg-accent transition-all ${
+                      weaknessHighlight
+                        ? "border-primary/40 bg-primary/5 ring-1 ring-primary/20"
+                        : "border-border"
+                    }`}
+                  >
+                    <TrendingDown className={`w-5 h-5 ${weaknessHighlight ? "text-primary" : "text-muted-foreground"}`} />
+                    <span className="text-sm font-bold">{lang === "ko" ? "약점 분석" : "Weakness"}</span>
+                    <span className="text-xs text-muted-foreground">
+                      {weaknessHighlight
+                        ? (lang === "ko" ? `틀린 ${wrongCount}문제 복습` : `Review ${wrongCount} missed`)
+                        : t.weaknessDesc}
+                    </span>
+                  </button>
+                </div>
+              );
+            })()}
 
             {/* Level & Streak — supplementary info, below CTAs */}
             {hasLevelOrStreak && (
