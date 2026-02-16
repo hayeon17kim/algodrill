@@ -74,43 +74,40 @@ export function HomeScreen({ progress, stats, user, dailyGoal, setDailyGoal, onS
         ) : (
           /* ── Returning user: Full dashboard ── */
           <>
-            {/* Hero area: Today's stats */}
+            {/* Hero area: Today's stats + primary CTA inside */}
             <StatsCard
               dailyGoal={dailyGoal}
               todayCorrect={stats.todayCorrect}
               todayTotal={stats.todayTotal}
+              dueCount={dueCount}
               setDailyGoal={setDailyGoal}
+              onStart={onStart}
             />
 
-            {/* Level & Streak — only if user has activity */}
+            {/* Sub CTAs — right after primary CTA */}
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                onClick={onCategoryMode}
+                className="flex flex-col items-center gap-1.5 p-4 rounded-2xl border-2 border-border bg-card text-foreground hover:bg-accent transition-colors"
+              >
+                <FolderOpen className="w-5 h-5 text-muted-foreground" />
+                <span className="text-sm font-bold">{t.categoryMode}</span>
+                <span className="text-xs text-muted-foreground">{t.categoryModeDesc}</span>
+              </button>
+              <button
+                onClick={onWeakness}
+                className="flex flex-col items-center gap-1.5 p-4 rounded-2xl border-2 border-border bg-card text-foreground hover:bg-accent transition-colors"
+              >
+                <TrendingDown className="w-5 h-5 text-muted-foreground" />
+                <span className="text-sm font-bold">{lang === "ko" ? "약점 분석" : "Weakness"}</span>
+                <span className="text-xs text-muted-foreground">{t.weaknessDesc}</span>
+              </button>
+            </div>
+
+            {/* Level & Streak — supplementary info, below CTAs */}
             {hasLevelOrStreak && (
               <LevelStreakCards stats={stats} />
             )}
-
-            {/* CTA buttons with clear hierarchy */}
-            <div className="space-y-3">
-              <Button onClick={onStart} size="lg" className="w-full h-16 text-lg btn-3d">
-                {dueCount > 0 ? t.startSession : t.reviewAll}
-              </Button>
-              <div className="grid grid-cols-2 gap-3">
-                <button
-                  onClick={onCategoryMode}
-                  className="flex flex-col items-center gap-1.5 p-4 rounded-2xl border-2 border-border bg-card text-foreground hover:bg-accent transition-colors"
-                >
-                  <FolderOpen className="w-5 h-5 text-muted-foreground" />
-                  <span className="text-sm font-bold">{t.categoryMode}</span>
-                  <span className="text-xs text-muted-foreground">{t.categoryModeDesc}</span>
-                </button>
-                <button
-                  onClick={onWeakness}
-                  className="flex flex-col items-center gap-1.5 p-4 rounded-2xl border-2 border-border bg-card text-foreground hover:bg-accent transition-colors"
-                >
-                  <TrendingDown className="w-5 h-5 text-muted-foreground" />
-                  <span className="text-sm font-bold">{lang === "ko" ? "약점 분석" : "Weakness"}</span>
-                  <span className="text-xs text-muted-foreground">{t.weaknessDesc}</span>
-                </button>
-              </div>
-            </div>
           </>
         )}
 

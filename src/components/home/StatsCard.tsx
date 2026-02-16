@@ -10,10 +10,12 @@ interface StatsCardProps {
   dailyGoal: number;
   todayCorrect: number;
   todayTotal: number;
+  dueCount: number;
   setDailyGoal: (goal: number) => void;
+  onStart: () => void;
 }
 
-export function StatsCard({ dailyGoal, todayCorrect, todayTotal, setDailyGoal }: StatsCardProps) {
+export function StatsCard({ dailyGoal, todayCorrect, todayTotal, dueCount, setDailyGoal, onStart }: StatsCardProps) {
   const { lang, t } = useLang();
   const [showGoalSelector, setShowGoalSelector] = useState(false);
 
@@ -108,6 +110,16 @@ export function StatsCard({ dailyGoal, todayCorrect, todayTotal, setDailyGoal }:
             </p>
           </div>
         </div>
+
+        {/* Primary CTA — inside the card for natural flow */}
+        <Button
+          onClick={onStart}
+          variant="secondary"
+          size="lg"
+          className="w-full h-14 text-lg font-black mt-4"
+        >
+          {dueCount > 0 ? t.startSession : t.reviewAll}
+        </Button>
       </CardContent>
     </Card>
   );

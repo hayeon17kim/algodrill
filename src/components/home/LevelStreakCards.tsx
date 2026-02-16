@@ -51,9 +51,11 @@ export function LevelStreakCards({ stats }: LevelStreakCardsProps) {
               {stats.currentStreak}
             </div>
           </div>
-          <div className="text-xs font-bold text-muted-foreground">
-            {t.bestStreak}: {stats.bestStreak}{t.streakDays}
-          </div>
+          {stats.bestStreak > 0 && (
+            <div className="text-xs font-bold text-muted-foreground">
+              {t.bestStreak}: {stats.bestStreak}{t.streakDays}
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

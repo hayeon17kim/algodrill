@@ -486,10 +486,11 @@ export function updateStreak(stats: Stats): Stats {
       lastStudyDate: today,
     };
   } else {
-    // Streak broken
+    // Streak broken or first-time study
     return {
       ...stats,
       currentStreak: 1,
+      bestStreak: Math.max(stats.bestStreak, 1),
       lastStudyDate: today,
     };
   }
